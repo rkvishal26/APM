@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B2B Transactions with MuleSoft Anypoint Partner Manager & EDI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --text-muted: #888;
+    --accent: #1a7fb5;
+    --accent-light: #e8f4fb;
+    --accent-dark: #0d5a82;
+    --bg: #fff;
+    --bg-soft: #fafafa;
+    --bg-code: #f4f4f4;
+    --border: #e8e8e8;
+    --border-strong: #ccc;
+    --green: #1a7a4a;
+    --green-bg: #eaf6f0;
+    --amber: #8a5c00;
+    --amber-bg: #fdf3dc;
+    --red: #a32020;
+    --red-bg: #fdf0f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+    background: #f2f0eb;
+    color: var(--text-primary);
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  /* ─── Header / hero ─── */
+  .hero {
+    background: linear-gradient(135deg, #0d2240 0%, #1a4a7a 45%, #0e6aad 100%);
+    color: #fff;
+    padding: 80px 24px 64px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    margin-bottom: 24px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 600;
+  }
+  .hero h1 {
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 700;
+    line-height: 1.22;
+    max-width: 800px;
+    margin: 0 auto 20px;
+    letter-spacing: -0.3px;
+  }
+  .hero-subtitle {
+    font-size: 18px;
+    color: rgba(255,255,255,0.8);
+    max-width: 620px;
+    margin: 0 auto 36px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    flex-wrap: wrap;
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.4);
+  }
+
+  /* ─── Layout ─── */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .article {
+    background: var(--bg);
+    max-width: 760px;
+    margin: -20px auto 60px;
+    border-radius: 12px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    padding: 56px 64px 72px;
+    position: relative;
+  }
+  @media(max-width: 640px) {
+    .article { padding: 32px 24px 48px; margin: -10px 12px 40px; }
+  }
+
+  /* ─── Typography ─── */
+  h2.section-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 56px 0 20px;
+    letter-spacing: -0.3px;
+    line-height: 1.3;
+  }
+  h3.sub-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 40px 0 14px;
+    line-height: 1.35;
+  }
+  h4.mini-title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 32px 0 10px;
+  }
+  p { margin-bottom: 22px; color: var(--text-primary); }
+  p.lead {
+    font-size: 20px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    font-weight: 300;
+    border-left: 4px solid var(--accent);
+    padding-left: 20px;
+    margin: 0 0 32px;
+    font-family: 'Lora', serif;
+    font-style: italic;
+  }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-light); }
+  a:hover { border-bottom-color: var(--accent); }
+  strong { font-weight: 600; }
+
+  /* ─── Dividers ─── */
+  .divider {
+    display: flex; align-items: center; gap: 14px;
+    margin: 48px 0;
+    color: var(--text-muted);
+    font-size: 22px;
+    letter-spacing: 6px;
+  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ─── Callout boxes ─── */
+  .callout {
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 28px 0;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  .callout-info { background: var(--accent-light); border-left: 4px solid var(--accent); }
+  .callout-success { background: var(--green-bg); border-left: 4px solid var(--green); }
+  .callout-warn { background: var(--amber-bg); border-left: 4px solid #d4900a; }
+  .callout-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .callout-info .callout-label { color: var(--accent-dark); }
+  .callout-success .callout-label { color: var(--green); }
+  .callout-warn .callout-label { color: var(--amber); }
+  .callout p { margin: 0; }
+  .callout p + p { margin-top: 10px; }
+
+  /* ─── Code blocks ─── */
+  pre {
+    background: #1e2636;
+    color: #c9d1d9;
+    border-radius: 8px;
+    padding: 22px 24px;
+    overflow-x: auto;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 20px 0 28px;
+    position: relative;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #161d2a;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 18px;
+    font-size: 12px;
+    color: #7a8898;
+    font-family: 'Source Code Pro', monospace;
+    margin-bottom: 0;
+    border-bottom: 1px solid #2d3748;
+  }
+  .code-header + pre { border-radius: 0 0 8px 8px; margin-top: 0; }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  code { font-family: 'Source Code Pro', monospace; font-size: 0.88em; background: var(--bg-code); padding: 2px 6px; border-radius: 4px; color: #c0392b; }
+  .kw { color: #79b8ff; }
+  .str { color: #9ecbff; }
+  .val { color: #f0a500; }
+  .cmt { color: #6a7f9a; font-style: italic; }
+  .key { color: #85e89d; }
+  .fn { color: #b392f0; }
+
+  /* ─── Architecture diagrams ─── */
+  .diagram-wrap {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 32px 20px 20px;
+    margin: 28px 0;
+    position: relative;
+    overflow-x: auto;
+  }
+  .diagram-caption {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 14px;
+    font-style: italic;
+  }
+  .diagram-label {
+    position: absolute; top: 10px; left: 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-muted);
+  }
+
+  /* ─── Tables ─── */
+  .table-wrap { overflow-x: auto; margin: 24px 0 32px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: #f0f0f0;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border-strong);
+    white-space: nowrap;
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafafa; }
+  .badge {
+    display: inline-block; padding: 2px 9px;
+    border-radius: 12px; font-size: 11.5px; font-weight: 600;
+  }
+  .badge-blue { background: var(--accent-light); color: var(--accent-dark); }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber); }
+
+  /* ─── Step list ─── */
+  .steps { list-style: none; margin: 0 0 28px; }
+  .steps li {
+    display: flex; gap: 18px;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .steps li:last-child { border-bottom: none; }
+  .step-num {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    margin-top: 1px;
+  }
+  .step-body strong { display: block; font-size: 15px; margin-bottom: 4px; }
+  .step-body p { margin: 0; font-size: 14.5px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ─── Feature grid ─── */
+  .feat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 24px 0 32px;
+  }
+  .feat-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 16px;
+  }
+  .feat-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .feat-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .feat-card p { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.55; }
+
+  /* ─── TOC ─── */
+  .toc {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px 26px;
+    margin: 32px 0 44px;
+  }
+  .toc h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 14px; }
+  .toc ol { padding-left: 20px; margin: 0; }
+  .toc ol li { font-size: 14.5px; padding: 4px 0; }
+  .toc ol li a { color: var(--accent); border-bottom: none; }
+  .toc ol li a:hover { text-decoration: underline; }
+
+  /* ─── Quote ─── */
+  blockquote {
+    border-left: 5px solid var(--accent);
+    margin: 36px 0;
+    padding: 6px 0 6px 28px;
+  }
+  blockquote p {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  blockquote cite {
+    display: block;
+    font-style: normal;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 10px;
+    font-family: 'Source Sans 3', sans-serif;
+  }
+
+  /* ─── EDI segment box ─── */
+  .edi-box {
+    background: #0d1117;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+  .edi-header {
+    background: #161b22;
+    padding: 10px 18px;
+    font-size: 12px;
+    color: #8b949e;
+    font-family: 'Source Code Pro', monospace;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .edi-body {
+    padding: 20px 22px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: #e6edf3;
+  }
+  .edi-seg { color: #f0883e; font-weight: 600; }
+  .edi-del { color: #8b949e; }
+  .edi-val { color: #7ee787; }
+  .edi-cmt { color: #8b949e; font-style: italic; }
+
+  /* ─── Image placeholder / architecture cards ─── */
+  .arch-image {
+    width: 100%; border-radius: 8px;
+    background: linear-gradient(135deg, #1a4a7a 0%, #0e6aad 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px 24px;
+    text-align: center;
+    color: #fff;
+  }
+  .arch-image svg { max-width: 100%; }
+
+  /* ─── References ─── */
+  .references {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 26px 28px;
+    margin-top: 48px;
+  }
+  .references h3 { font-family: 'Lora', serif; font-size: 18px; margin-bottom: 16px; }
+  .references ol { padding-left: 22px; font-size: 13.5px; line-height: 1.7; }
+  .references li { margin-bottom: 10px; color: var(--text-secondary); }
+  .references a { color: var(--accent); }
+
+  /* ─── Tags ─── */
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 36px 0 0; }
+  .tag {
+    padding: 5px 14px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* ─── Footer ─── */
+  footer {
+    text-align: center;
+    padding: 32px 24px 48px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  footer span { margin: 0 8px; }
+
+  /* ─── Print ─── */
+  @media print {
+    body { background: #fff; }
+    .article { box-shadow: none; border: 1px solid #eee; }
+    .hero { background: #1a4a7a; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  HERO                                                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-tag">Integration Architecture · EDI · MuleSoft</div>
+  <h1>B2B Transactions at Scale: MuleSoft Anypoint Partner Manager &amp; EDI</h1>
+  <p class="hero-subtitle" style="font-style:normal;font-family:'Source Sans 3',sans-serif;color:rgba(255,255,255,0.8)">
+    A deep-dive into how modern enterprises automate purchase orders, invoices, and shipment notices using Anypoint Partner Manager, AS2, SFTP, and EDI X12/EDIFACT standards.
+  </p>
+  <div class="hero-meta">
+    <span><div class="avatar">VS</div> Vishal Singh &nbsp;·&nbsp; Integration Engineer</span>
+    <span>📅 March 2026</span>
+    <span>🕐 22 min read</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  ARTICLE BODY                                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="article">
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h4>Contents</h4>
+    <ol>
+      <li><a href="#s1">What is B2B Integration — and why does it matter?</a></li>
+      <li><a href="#s2">EDI Fundamentals: X12, EDIFACT, and Key Transaction Sets</a></li>
+      <li><a href="#s3">Introducing Anypoint Partner Manager</a></li>
+      <li><a href="#s4">Core Architecture, Internal Services &amp; MQ Layer</a></li>
+      <li><a href="#s5">Inbound Flow: Partner → Host (850 Purchase Order)</a></li>
+      <li><a href="#s6">Outbound Flow: Host → Partner (810 Invoice &amp; 856 ASN)</a></li>
+      <li><a href="#s7">Transport Protocols: AS2, SFTP, HTTPS</a></li>
+      <li><a href="#s8">Partner Onboarding: Step-by-step</a></li>
+      <li><a href="#s9">DataWeave Mapping: EDI → JSON</a></li>
+      <li><a href="#s10">Monitoring, Replay &amp; Operations</a></li>
+      <li><a href="#s11">Real-World Use Case: Retailer Order-to-Cash</a></li>
+      <li><a href="#s12">Best Practices &amp; Common Pitfalls</a></li>
+      <li><a href="#s13">References</a></li>
+    </ol>
+  </div>
+
+  <!-- INTRO -->
+  <p class="lead">
+    B2B integration sits at the intersection of business operations and technical architecture. When it works, nobody notices. When it breaks — an 856 ASN that arrives after the truck, an 810 invoice that fails three-way matching — the consequences are immediate and financial. That is why getting it right matters.
+  </p>
+
+  <p>If you have ever worked in supply chain, manufacturing, or retail, you know the frustration: dozens of trading partners, each with slightly different message formats, different transport preferences, different timing requirements. One partner wants X12 850 over AS2. Another wants EDIFACT ORDERS over SFTP. A third has finally moved to REST APIs. Managing all of this manually — or with a patchwork of custom scripts — is a nightmare that grows more expensive every year.</p>
+
+  <p>This article is a comprehensive technical walkthrough of how <strong>MuleSoft's Anypoint Partner Manager (APM)</strong> solves this problem. We will cover EDI standards, the APM architecture, inbound and outbound message flows, DataWeave mapping, transport security, partner onboarding, and real-world operational patterns. By the end, you should have a solid mental model of how an enterprise-grade B2B integration platform works — and how to build one.</p>
+
+  <!-- ─── SECTION 1 ─── -->
+  <h2 class="section-title" id="s1">1. What is B2B Integration — and Why Does It Matter?</h2>
+
+  <p>Business-to-Business (B2B) integration is the automated, structured exchange of business documents — purchase orders, invoices, advance ship notices, inventory inquiries — between two or more organisations. Unlike internal API integrations (where you control both sides), B2B integration has to accommodate the technology preferences, legacy constraints, and compliance requirements of your partners.</p>
+
+  <p>The scale of the problem is staggering. A large retailer like Walmart or Target processes millions of EDI transactions per day. A mid-size distributor might have 200+ active trading partners at any given time, each with unique mapping requirements. Even a relatively small manufacturer dealing with 20–30 suppliers faces enormous operational overhead if each integration is built and maintained independently.</p>
+
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon" style="background:#e8f4fb">📦</div>
+      <h4>Order Management</h4>
+      <p>Purchase orders, acknowledgements, and change requests flow automatically between buyers and sellers.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:#eaf6f0">🚚</div>
+      <h4>Logistics &amp; Shipment</h4>
+      <p>Advance Ship Notices (ASN) and carrier status updates enable receiving dock preparation and 3-way matching.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:#fdf3dc">💳</div>
+      <h4>Invoicing &amp; Payment</h4>
+      <p>Electronic invoices (EDI 810) and remittance advice (820) dramatically shorten the procure-to-pay cycle.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:#f5ebff">📊</div>
+      <h4>Inventory &amp; Forecast</h4>
+      <p>Inventory inquiries (846) and planning schedules (830) keep demand-supply plans synchronised across the network.</p>
+    </div>
+  </div>
+
+  <p>The traditional approach — outsourcing to a Value-Added Network (VAN) like Sterling Commerce or OpenText — was viable when EDI volumes were low and change was slow. But digital transformation has fundamentally altered expectations. Partners want faster onboarding. Business teams want real-time visibility. AI agents need structured transaction data. VANs were simply not designed for this world.</p>
+
+  <p>The shift is to bring B2B integrations in-house, onto a modern integration platform — one that unifies EDI, APIs, and emerging AI-driven workflows under a single operational umbrella. That is precisely what Anypoint Partner Manager is designed to do.</p>
+
+  <!-- ─── SECTION 2 ─── -->
+  <h2 class="section-title" id="s2">2. EDI Fundamentals: X12, EDIFACT, and Key Transaction Sets</h2>
+
+  <p>Before diving into APM, it is worth grounding ourselves in EDI standards. Electronic Data Interchange (EDI) is a set of standards that define how business documents should be structured and transmitted electronically. Think of it as a universal language for business documents — rigid and verbose compared to JSON, but deeply embedded in the fabric of global commerce.</p>
+
+  <h3 class="sub-title">2.1 ANSI X12 vs. UN/EDIFACT</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Attribute</th>
+          <th>ANSI ASC X12</th>
+          <th>UN/EDIFACT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Governing Body</strong></td>
+          <td>American National Standards Institute (ANSI)</td>
+          <td>United Nations Centre for Trade Facilitation</td>
+        </tr>
+        <tr>
+          <td><strong>Primary Usage</strong></td>
+          <td>North America (USA, Canada, Mexico)</td>
+          <td>Europe, Asia, global trade</td>
+        </tr>
+        <tr>
+          <td><strong>Envelope Structure</strong></td>
+          <td>ISA → GS → ST … SE → GE → IEA</td>
+          <td>UNB → UNH … UNT → UNZ</td>
+        </tr>
+        <tr>
+          <td><strong>PO Transaction</strong></td>
+          <td>850 Purchase Order</td>
+          <td>ORDERS</td>
+        </tr>
+        <tr>
+          <td><strong>Invoice</strong></td>
+          <td>810 Invoice</td>
+          <td>INVOIC</td>
+        </tr>
+        <tr>
+          <td><strong>Ship Notice</strong></td>
+          <td>856 Advance Ship Notice</td>
+          <td>DESADV (Despatch Advice)</td>
+        </tr>
+        <tr>
+          <td><strong>Acknowledgement</strong></td>
+          <td>997 Functional Acknowledgement</td>
+          <td>CONTRL</td>
+        </tr>
+        <tr>
+          <td><strong>Delimiter (default)</strong></td>
+          <td>* (element), ~ (segment)</td>
+          <td>+ (element), ' (segment)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">2.2 The X12 Envelope Structure</h3>
+
+  <p>Every X12 EDI file is wrapped in three nested envelopes. Understanding this nesting is essential for configuring APM correctly — each envelope level carries identifiers that APM uses to route messages to the right message flow.</p>
+
+  <!-- Diagram: X12 Envelope -->
+  <div class="diagram-wrap">
+    <div class="diagram-label">Architecture Diagram</div>
+    <svg width="100%" viewBox="0 0 660 340" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <!-- ISA/IEA outer -->
+      <rect x="20" y="20" width="620" height="300" rx="12" fill="#e8f4fb" stroke="#1a7fb5" stroke-width="1.5" stroke-dasharray="6 3"/>
+      <text x="36" y="44" font-size="13" font-weight="700" fill="#1a7fb5">ISA — Interchange Control Header</text>
+      <text x="36" y="58" font-size="11" fill="#5a8ab0">ISA*00*          *00*          *ZZ*BUYERID        *12*5142645505    *260330*0728*|*00403*000000013*0*P*}</text>
+      <!-- GS/GE middle -->
+      <rect x="40" y="70" width="580" height="225" rx="8" fill="#eaf6f0" stroke="#1a7a4a" stroke-width="1.2" stroke-dasharray="5 3"/>
+      <text x="56" y="92" font-size="12" font-weight="700" fill="#1a7a4a">GS — Functional Group Header</text>
+      <text x="56" y="106" font-size="11" fill="#4a8a6a">GS*PO*BUYERID*5142645505*20260330*0728*1013*X*004030</text>
+      <!-- ST/SE inner -->
+      <rect x="60" y="116" width="540" height="155" rx="6" fill="#fdf3dc" stroke="#d4900a" stroke-width="1.2"/>
+      <text x="76" y="136" font-size="12" font-weight="700" fill="#8a5c00">ST — Transaction Set Header (850 Purchase Order)</text>
+      <text x="76" y="152" font-size="11" fill="#8a5c00">ST*850*0001~</text>
+      <!-- Body segments -->
+      <rect x="76" y="162" width="508" height="78" rx="4" fill="white" stroke="#ddd" stroke-width="0.8"/>
+      <text x="90" y="180" font-size="11" fill="#555">BEG*00*NE*PO-20260330-001**20260330~</text>
+      <text x="90" y="196" font-size="11" fill="#555">N1*BT*ACME CORP*92*ACM001~</text>
+      <text x="90" y="212" font-size="11" fill="#555">PO1*1*500*EA*24.99**VP*SKU-9871~</text>
+      <text x="90" y="228" font-size="11" fill="#555">CTT*1~  AMT*TT*12495.00~</text>
+      <text x="90" y="244" font-size="11" fill="#555">SE*8*0001~</text>
+      <!-- Labels right -->
+      <text x="548" y="136" font-size="10" fill="#8a5c00" text-anchor="end">Transaction Set</text>
+      <text x="580" y="92" font-size="10" fill="#1a7a4a" text-anchor="end">Functional Group</text>
+      <text x="600" y="44" font-size="10" fill="#1a7fb5" text-anchor="end">Interchange</text>
+      <!-- Bottom labels -->
+      <text x="76" y="252" font-size="11" fill="#8a5c00">SE — Transaction Set Trailer</text>
+      <text x="56" y="280" font-size="11" fill="#1a7a4a">GE — Functional Group Trailer  →  GE*1*1013~</text>
+      <text x="36" y="308" font-size="11" fill="#1a7fb5">IEA — Interchange Trailer  →  IEA*1*000000013~</text>
+    </svg>
+    <p class="diagram-caption">Figure 1 — The three-level X12 EDI envelope structure. APM reads ISA/GS identifiers to route each transaction to the appropriate message flow.</p>
+  </div>
+
+  <h3 class="sub-title">2.3 The Core EDI Transaction Sets You Need to Know</h3>
+
+  <p>While there are over 300 X12 transaction sets, the following six cover the vast majority of supply chain B2B workflows. Understanding what each document carries — and when it is transmitted — is essential for designing your APM message flows.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Code</th><th>Name</th><th>Direction</th><th>Purpose</th><th>Triggers</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>850</code></td>
+          <td>Purchase Order</td>
+          <td><span class="badge badge-blue">Buyer → Seller</span></td>
+          <td>Initiates an order with item, qty, price, ship-to, payment terms</td>
+          <td>Inventory replenishment, customer order</td>
+        </tr>
+        <tr>
+          <td><code>855</code></td>
+          <td>PO Acknowledgement</td>
+          <td><span class="badge badge-green">Seller → Buyer</span></td>
+          <td>Confirms receipt; accepts, rejects, or back-orders line items</td>
+          <td>After receiving 850</td>
+        </tr>
+        <tr>
+          <td><code>856</code></td>
+          <td>Advance Ship Notice</td>
+          <td><span class="badge badge-green">Seller → Buyer</span></td>
+          <td>Details shipment contents (SSCC-18 labels, pallet/carton hierarchy)</td>
+          <td>After goods leave warehouse</td>
+        </tr>
+        <tr>
+          <td><code>810</code></td>
+          <td>Invoice</td>
+          <td><span class="badge badge-green">Seller → Buyer</span></td>
+          <td>Electronic bill for goods/services; enables 3-way PO matching</td>
+          <td>After shipment</td>
+        </tr>
+        <tr>
+          <td><code>846</code></td>
+          <td>Inventory Inquiry</td>
+          <td><span class="badge badge-blue">Seller → Buyer</span></td>
+          <td>Stock level status and pricing information</td>
+          <td>Scheduled or on-demand</td>
+        </tr>
+        <tr>
+          <td><code>997</code></td>
+          <td>Functional Acknowledgement</td>
+          <td><span class="badge badge-amber">Bidirectional</span></td>
+          <td>Confirms receipt and syntactic validity of any transaction set</td>
+          <td>After receiving any document</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">2.4 Reading an EDI 850 Purchase Order</h3>
+
+  <p>Let us look at a real (abbreviated) EDI 850 Purchase Order to understand what the raw data looks like before APM processes it. Each segment begins with a two- or three-character identifier; data elements are separated by <code>*</code>; segments are terminated by <code>~</code>.</p>
+
+  <div class="edi-box">
+    <div class="edi-header">
+      <div><span style="color:#e6edf3">EDI X12 — 850 Purchase Order</span></div>
+      <div>Version 004030 · Delimiters: * | ~</div>
+    </div>
+    <div class="edi-body">
+<span class="edi-cmt">// Interchange Envelope</span>
+<span class="edi-seg">ISA</span><span class="edi-del">*</span><span class="edi-val">00</span><span class="edi-del">*          *</span><span class="edi-val">00</span><span class="edi-del">*          *</span><span class="edi-val">ZZ</span><span class="edi-del">*</span><span class="edi-val">RETAILERCO    </span><span class="edi-del">*</span><span class="edi-val">12</span><span class="edi-del">*</span><span class="edi-val">5142645505    </span><span class="edi-del">*</span><span class="edi-val">260330</span><span class="edi-del">*</span><span class="edi-val">0900</span><span class="edi-del">*|*</span><span class="edi-val">00403</span><span class="edi-del">*</span><span class="edi-val">000000013</span><span class="edi-del">*</span><span class="edi-val">0</span><span class="edi-del">*</span><span class="edi-val">P</span><span class="edi-del">*}</span>
+<span class="edi-seg">GS</span><span class="edi-del">*</span><span class="edi-val">PO</span><span class="edi-del">*</span><span class="edi-val">RETAILERCO</span><span class="edi-del">*</span><span class="edi-val">5142645505</span><span class="edi-del">*</span><span class="edi-val">20260330</span><span class="edi-del">*</span><span class="edi-val">0900</span><span class="edi-del">*</span><span class="edi-val">1013</span><span class="edi-del">*X*</span><span class="edi-val">004030</span>
+<span class="edi-seg">ST</span><span class="edi-del">*</span><span class="edi-val">850</span><span class="edi-del">*</span><span class="edi-val">0001</span><span class="edi-del">~</span>
+
+<span class="edi-cmt">// Beginning Segment — PO type, number, date</span>
+<span class="edi-seg">BEG</span><span class="edi-del">*</span><span class="edi-val">00</span><span class="edi-del">*</span><span class="edi-val">NE</span><span class="edi-del">*</span><span class="edi-val">PO-2026-00421</span><span class="edi-del">**</span><span class="edi-val">20260330</span><span class="edi-del">~</span>
+
+<span class="edi-cmt">// Ship-To Name and Address</span>
+<span class="edi-seg">N1</span><span class="edi-del">*</span><span class="edi-val">ST</span><span class="edi-del">*</span><span class="edi-val">RETAILER WAREHOUSE 7</span><span class="edi-del">*</span><span class="edi-val">92</span><span class="edi-del">*</span><span class="edi-val">WHSE007</span><span class="edi-del">~</span>
+<span class="edi-seg">N3</span><span class="edi-del">*</span><span class="edi-val">1500 INDUSTRIAL PARKWAY</span><span class="edi-del">~</span>
+<span class="edi-seg">N4</span><span class="edi-del">*</span><span class="edi-val">CHICAGO</span><span class="edi-del">*</span><span class="edi-val">IL</span><span class="edi-del">*</span><span class="edi-val">60601</span><span class="edi-del">~</span>
+
+<span class="edi-cmt">// Purchase Order Line Item 1</span>
+<span class="edi-seg">PO1</span><span class="edi-del">*</span><span class="edi-val">1</span><span class="edi-del">*</span><span class="edi-val">500</span><span class="edi-del">*</span><span class="edi-val">EA</span><span class="edi-del">*</span><span class="edi-val">24.99</span><span class="edi-del">**</span><span class="edi-val">VP</span><span class="edi-del">*</span><span class="edi-val">SKU-SHOE-9871</span><span class="edi-del">*</span><span class="edi-val">UP</span><span class="edi-del">*</span><span class="edi-val">012345678901</span><span class="edi-del">~</span>
+<span class="edi-seg">PID</span><span class="edi-del">*F**</span><span class="edi-del">*</span><span class="edi-del">*</span><span class="edi-val">RUNNING SHOE SIZE 10 BLACK</span><span class="edi-del">~</span>
+
+<span class="edi-cmt">// Purchase Order Line Item 2</span>
+<span class="edi-seg">PO1</span><span class="edi-del">*</span><span class="edi-val">2</span><span class="edi-del">*</span><span class="edi-val">300</span><span class="edi-del">*</span><span class="edi-val">EA</span><span class="edi-del">*</span><span class="edi-val">31.50</span><span class="edi-del">**</span><span class="edi-val">VP</span><span class="edi-del">*</span><span class="edi-val">SKU-SHOE-9872</span><span class="edi-del">*</span><span class="edi-val">UP</span><span class="edi-del">*</span><span class="edi-val">012345678902</span><span class="edi-del">~</span>
+<span class="edi-seg">PID</span><span class="edi-del">*F**</span><span class="edi-del">*</span><span class="edi-del">*</span><span class="edi-val">TRAIL SHOE SIZE 9 GREY</span><span class="edi-del">~</span>
+
+<span class="edi-cmt">// Transaction Totals</span>
+<span class="edi-seg">CTT</span><span class="edi-del">*</span><span class="edi-val">2</span><span class="edi-del">~</span>
+<span class="edi-seg">AMT</span><span class="edi-del">*</span><span class="edi-val">TT</span><span class="edi-del">*</span><span class="edi-val">21945.00</span><span class="edi-del">~</span>
+<span class="edi-seg">SE</span><span class="edi-del">*</span><span class="edi-val">12</span><span class="edi-del">*</span><span class="edi-val">0001</span><span class="edi-del">~</span>
+<span class="edi-seg">GE</span><span class="edi-del">*</span><span class="edi-val">1</span><span class="edi-del">*</span><span class="edi-val">1013</span><span class="edi-del">~</span>
+<span class="edi-seg">IEA</span><span class="edi-del">*</span><span class="edi-val">1</span><span class="edi-del">*</span><span class="edi-val">000000013</span><span class="edi-del">~</span>
+    </div>
+  </div>
+
+  <p>The <code>PO1</code> segment is the core of the purchase order: it carries the line item number, quantity (500 EA), unit price ($24.99), vendor part number (VP/SKU-SHOE-9871), and UPC. The <code>N1*ST</code> loop provides the ship-to location. APM will parse all of this, validate it against the configured schema, and trigger your DataWeave transformation to produce a clean JSON payload for your ERP.</p>
+
+  <!-- ─── SECTION 3 ─── -->
+  <h2 class="section-title" id="s3">3. Introducing Anypoint Partner Manager</h2>
+
+  <p>Anypoint Partner Manager (APM) is MuleSoft's cloud-native B2B integration platform. It sits at the intersection of the Anypoint Platform ecosystem — inheriting API-led connectivity, DataWeave, Anypoint Studio, and CloudHub — and the world of traditional EDI standards.</p>
+
+  <p>At its core, APM provides three things:</p>
+
+  <ul style="margin: 0 0 22px; padding-left: 24px; line-height: 2;">
+    <li><strong>A control plane</strong> for configuring partners, message types, endpoints, and mappings — via a browser-based UI, without writing Mule code for every partner.</li>
+    <li><strong>A runtime engine</strong> (deployed on CloudHub or Anypoint Runtime Fabric) that receives, validates, transforms, and routes B2B messages in real time.</li>
+    <li><strong>An operational console</strong> for monitoring transactions, replaying failures, and generating audit reports — accessible to both IT and business users.</li>
+  </ul>
+
+  <div class="callout callout-info">
+    <div class="callout-label">Key Positioning</div>
+    <p>APM is not a standalone product. It is deeply integrated with the rest of the Anypoint Platform. Message flows deployed by APM run as standard Mule applications on CloudHub. Endpoints can be managed through Anypoint API Manager for policy enforcement. Message type schemas can be published to Anypoint Exchange.</p>
+  </div>
+
+  <h3 class="sub-title">3.1 Supported Protocols and Formats</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Category</th><th>Supported Options</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Message Formats</strong></td>
+          <td>EDI X12 (including VICS, UCS), UN/EDIFACT, JSON, XML, CSV/Delimited</td>
+        </tr>
+        <tr>
+          <td><strong>Transport Protocols</strong></td>
+          <td>AS2, SFTP, FTP, HTTP, HTTPS</td>
+        </tr>
+        <tr>
+          <td><strong>Payload Storage</strong></td>
+          <td>Amazon S3, Azure Blob Storage, custom database, internal storage API</td>
+        </tr>
+        <tr>
+          <td><strong>Deployment Targets</strong></td>
+          <td>CloudHub (MuleSoft-hosted iPaaS), Anypoint Runtime Fabric (customer-hosted)</td>
+        </tr>
+        <tr>
+          <td><strong>Downstream Connectors</strong></td>
+          <td>Salesforce, SAP, ServiceNow, NetSuite, Oracle ERP (via Anypoint Exchange connectors)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">3.2 Key Concepts</h3>
+
+  <p>Before we look at the architecture, let us define the terminology APM uses. Getting these straight will make the rest of the article much cleaner.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Term</th><th>Definition</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Host</strong></td>
+          <td>Your organisation's identity in APM. There is exactly one host per APM instance. The host profile contains your EDI identifiers (ISA06, GS02) and AS2 certificates.</td>
+        </tr>
+        <tr>
+          <td><strong>Partner</strong></td>
+          <td>An external trading partner. Each partner has its own profile containing identifiers, certificates, and transport endpoint configurations.</td>
+        </tr>
+        <tr>
+          <td><strong>Message Type</strong></td>
+          <td>Defines the schema and direction of a document (e.g., "Receive X12 850 from Partner"). Contains the DataWeave mapping that transforms the EDI payload.</td>
+        </tr>
+        <tr>
+          <td><strong>Message Flow</strong></td>
+          <td>The end-to-end pipeline that combines a partner, a transport endpoint, and one or more message types. Deploying a message flow generates real Mule applications on CloudHub.</td>
+        </tr>
+        <tr>
+          <td><strong>Transmission</strong></td>
+          <td>A single transport-level event — e.g., one AS2 HTTP POST received. A transmission may contain multiple transactions.</td>
+        </tr>
+        <tr>
+          <td><strong>Transaction</strong></td>
+          <td>A single business document — e.g., one 850 Purchase Order. Transactions are extracted from transmissions after parsing.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ─── SECTION 4 ─── -->
+  <h2 class="section-title" id="s4">4. Core Architecture, Internal Services &amp; MQ Layer</h2>
+
+  <p>APM's architecture is built around a set of specialised internal services that work together to handle the full lifecycle of a B2B message. Understanding these services is important when you are diagnosing failures, sizing your CloudHub deployment, or explaining the platform to a new team member.</p>
+
+  <!-- Architecture diagram -->
+  <div class="diagram-wrap">
+    <div class="diagram-label">Architecture Diagram</div>
+    <svg width="100%" viewBox="0 0 660 480" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;font-size:12px;">
+      <defs>
+        <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <!-- Control Plane container -->
+      <rect x="10" y="10" width="260" height="460" rx="10" fill="#f8f4ff" stroke="#9b59b6" stroke-width="1.2" stroke-dasharray="6 3"/>
+      <text x="140" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#7d3c98" letter-spacing="0.08em">CONTROL PLANE (SaaS)</text>
+      <!-- CP boxes -->
+      <rect x="26" y="44" width="228" height="50" rx="6" fill="#e8d5f5" stroke="#9b59b6" stroke-width="0.8"/>
+      <text x="140" y="64" text-anchor="middle" font-size="12" font-weight="600" fill="#6c2a8a">Partner Manager UI</text>
+      <text x="140" y="81" text-anchor="middle" font-size="10" fill="#6c2a8a">Configure partners, flows, mappings</text>
+
+      <rect x="26" y="106" width="228" height="50" rx="6" fill="#e8d5f5" stroke="#9b59b6" stroke-width="0.8"/>
+      <text x="140" y="126" text-anchor="middle" font-size="12" font-weight="600" fill="#6c2a8a">Partner Manager API</text>
+      <text x="140" y="143" text-anchor="middle" font-size="10" fill="#6c2a8a">REST API for automation &amp; AI agents</text>
+
+      <rect x="26" y="168" width="228" height="50" rx="6" fill="#e8d5f5" stroke="#9b59b6" stroke-width="0.8"/>
+      <text x="140" y="188" text-anchor="middle" font-size="12" font-weight="600" fill="#6c2a8a">Configuration Store</text>
+      <text x="140" y="205" text-anchor="middle" font-size="10" fill="#6c2a8a">Partner profiles, certs, mappings</text>
+
+      <rect x="26" y="230" width="228" height="50" rx="6" fill="#e8d5f5" stroke="#9b59b6" stroke-width="0.8"/>
+      <text x="140" y="250" text-anchor="middle" font-size="12" font-weight="600" fill="#6c2a8a">Payload Storage API</text>
+      <text x="140" y="267" text-anchor="middle" font-size="10" fill="#6c2a8a">S3 / Azure Blob / Custom</text>
+
+      <rect x="26" y="292" width="228" height="50" rx="6" fill="#e8d5f5" stroke="#9b59b6" stroke-width="0.8"/>
+      <text x="140" y="312" text-anchor="middle" font-size="12" font-weight="600" fill="#6c2a8a">Tracking Service</text>
+      <text x="140" y="329" text-anchor="middle" font-size="10" fill="#6c2a8a">Transmissions, transactions, audit</text>
+
+      <rect x="26" y="354" width="228" height="50" rx="6" fill="#e8d5f5" stroke="#9b59b6" stroke-width="0.8"/>
+      <text x="140" y="374" text-anchor="middle" font-size="12" font-weight="600" fill="#6c2a8a">Replication Service</text>
+      <text x="140" y="391" text-anchor="middle" font-size="10" fill="#6c2a8a">Syncs config to runtime</text>
+
+      <rect x="26" y="416" width="228" height="40" rx="6" fill="#e8d5f5" stroke="#9b59b6" stroke-width="0.8"/>
+      <text x="140" y="441" text-anchor="middle" font-size="12" font-weight="600" fill="#6c2a8a">Transaction Replay</text>
+
+      <!-- Runtime container -->
+      <rect x="290" y="10" width="360" height="460" rx="10" fill="#eaf6f0" stroke="#1a7a4a" stroke-width="1.2" stroke-dasharray="6 3"/>
+      <text x="470" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#145a38" letter-spacing="0.08em">DATA PLANE (CloudHub / Runtime Fabric)</text>
+
+      <!-- Receive -->
+      <rect x="306" y="44" width="165" height="60" rx="6" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.8"/>
+      <text x="389" y="66" text-anchor="middle" font-size="12" font-weight="600" fill="#145a38">Receive Service</text>
+      <text x="389" y="81" text-anchor="middle" font-size="10" fill="#145a38">AS2, SFTP, HTTPS endpoints</text>
+      <text x="389" y="96" text-anchor="middle" font-size="10" fill="#145a38">Inbound B2B messages</text>
+
+      <!-- Core B2B engine -->
+      <rect x="306" y="120" width="165" height="76" rx="6" fill="#a8e6c8" stroke="#0e6644" stroke-width="1"/>
+      <text x="389" y="142" text-anchor="middle" font-size="12" font-weight="700" fill="#0a4a2e">Core B2B Engine</text>
+      <text x="389" y="158" text-anchor="middle" font-size="10" fill="#0a4a2e">Parse · Validate · Transform</text>
+      <text x="389" y="173" text-anchor="middle" font-size="10" fill="#0a4a2e">Route · Acknowledge (997)</text>
+      <text x="389" y="188" text-anchor="middle" font-size="10" fill="#0a4a2e">DataWeave Mappings</text>
+
+      <!-- Dispatch -->
+      <rect x="306" y="212" width="165" height="60" rx="6" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.8"/>
+      <text x="389" y="234" text-anchor="middle" font-size="12" font-weight="600" fill="#145a38">Dispatch Service</text>
+      <text x="389" y="250" text-anchor="middle" font-size="10" fill="#145a38">Deliver to ERP, WMS, OMS</text>
+      <text x="389" y="265" text-anchor="middle" font-size="10" fill="#145a38">HTTP/HTTPS/SFTP outbound</text>
+
+      <!-- Transmit -->
+      <rect x="306" y="288" width="165" height="60" rx="6" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.8"/>
+      <text x="389" y="310" text-anchor="middle" font-size="12" font-weight="600" fill="#145a38">Transmit Service</text>
+      <text x="389" y="326" text-anchor="middle" font-size="10" fill="#145a38">Send EDI to partner via</text>
+      <text x="389" y="341" text-anchor="middle" font-size="10" fill="#145a38">AS2 / SFTP / HTTPS</text>
+
+      <!-- External partners box -->
+      <rect x="490" y="44" width="148" height="82" rx="8" fill="#fdf3dc" stroke="#d4900a" stroke-width="1"/>
+      <text x="564" y="64" text-anchor="middle" font-size="11" font-weight="700" fill="#7a4d00">Trading Partners</text>
+      <text x="564" y="80" text-anchor="middle" font-size="10" fill="#7a4d00">Retailers, Suppliers</text>
+      <text x="564" y="95" text-anchor="middle" font-size="10" fill="#7a4d00">Distributors, 3PLs</text>
+      <text x="564" y="112" text-anchor="middle" font-size="10" fill="#7a4d00">via AS2 · SFTP · HTTPS</text>
+
+      <!-- Internal systems box -->
+      <rect x="490" y="240" width="148" height="108" rx="8" fill="#e8f4fb" stroke="#1a7fb5" stroke-width="1"/>
+      <text x="564" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#0d5a82">Internal Systems</text>
+      <text x="564" y="278" text-anchor="middle" font-size="10" fill="#0d5a82">ERP (SAP / Oracle)</text>
+      <text x="564" y="294" text-anchor="middle" font-size="10" fill="#0d5a82">OMS / WMS</text>
+      <text x="564" y="310" text-anchor="middle" font-size="10" fill="#0d5a82">Salesforce / NetSuite</text>
+      <text x="564" y="326" text-anchor="middle" font-size="10" fill="#0d5a82">CRM / Billing</text>
+      <text x="564" y="342" text-anchor="middle" font-size="10" fill="#0d5a82">via HTTP / HTTPS</text>
+
+      <!-- Arrows -->
+      <!-- Partner → Receive -->
+      <line x1="490" y1="86" x2="471" y2="86" stroke="#d4900a" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <!-- Receive → Core -->
+      <line x1="389" y1="104" x2="389" y2="120" stroke="#1a7a4a" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <!-- Core → Dispatch -->
+      <line x1="389" y1="196" x2="389" y2="212" stroke="#1a7a4a" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <!-- Dispatch → Internal -->
+      <line x1="471" y1="244" x2="490" y2="286" stroke="#1a7fb5" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <!-- Core → Transmit -->
+      <line x1="360" y1="272" x2="360" y2="288" stroke="#1a7a4a" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr2)"/>
+      <!-- Transmit → Partner -->
+      <path d="M471 318 L490 318 Q500 318 500 210 L500 126" stroke="#d4900a" stroke-width="1.2" stroke-dasharray="4 3" fill="none" marker-end="url(#arr2)"/>
+      <!-- Runtime → Tracking -->
+      <line x1="290" y1="317" x2="254" y2="317" stroke="#9b59b6" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#arr2)"/>
+      <!-- Runtime → Payload -->
+      <line x1="290" y1="255" x2="254" y2="255" stroke="#9b59b6" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#arr2)"/>
+      <!-- Replication to runtime (config sync) -->
+      <line x1="254" y1="379" x2="290" y2="379" stroke="#9b59b6" stroke-width="1" marker-end="url(#arr2)"/>
+      <!-- Internal → Core (outbound) -->
+      <path d="M490 310 L480 310 L480 158 L471 158" stroke="#1a7fb5" stroke-width="1" stroke-dasharray="4 3" fill="none" marker-end="url(#arr2)"/>
+
+      <!-- Legend -->
+      <line x1="310" y1="420" x2="340" y2="420" stroke="#1a7a4a" stroke-width="1.5"/>
+      <text x="345" y="424" font-size="10" fill="#555">Inbound flow</text>
+      <line x1="390" y1="420" x2="420" y2="420" stroke="#d4900a" stroke-width="1.2" stroke-dasharray="4 3"/>
+      <text x="425" y="424" font-size="10" fill="#555">Outbound flow</text>
+      <line x1="480" y1="420" x2="510" y2="420" stroke="#9b59b6" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="515" y="424" font-size="10" fill="#555">Control/audit</text>
+    </svg>
+    <p class="diagram-caption">Figure 2 — APM high-level architecture: control plane (left, SaaS) and data plane (right, CloudHub / Runtime Fabric). All five internal services are shown with their data flows.</p>
+  </div>
+
+  <h3 class="sub-title">4.1 The Five Core Services</h3>
+
+  <p><strong>Receive Service</strong> — These are the entry points for inbound B2B messages. APM creates and manages AS2, SFTP listener, and HTTPS endpoints. When a partner sends an 850 over AS2, the receive service accepts the transport-level connection, validates the AS2 headers and MDN (Message Disposition Notification), extracts the payload, and hands it to the Core B2B Engine.</p>
+
+  <p><strong>Core B2B Engine</strong> — This is the central processing component. It parses the raw EDI (using the X12 Connector or EDIFACT Connector), validates the transaction against the configured schema, applies any partner-specific validation rules, fires the DataWeave map to transform the payload into your target format (typically JSON for downstream API calls), and generates a 997 Functional Acknowledgement. Any parsing or validation errors are captured and surfaced in the monitoring dashboard.</p>
+
+  <p><strong>Dispatch Service</strong> — Once transformation is complete, the dispatch service delivers the application message to the configured downstream system — SAP via an IDoc connector, Salesforce via REST, a custom ERP via HTTP — using the target protocol. This service also handles retry logic and dead-letter queuing for failed deliveries.</p>
+
+  <p><strong>Transmit Service</strong> — Handles outbound EDI: taking an application message from your internal system (e.g., a JSON invoice from your ERP), running it through the outbound DataWeave map to produce EDI X12 810, and transmitting it to the partner via their configured protocol (AS2, SFTP, or HTTPS).</p>
+
+  <p><strong>Tracking Service</strong> — Every transmission and transaction is logged to the control plane. This gives APM its end-to-end visibility capability — you can trace a specific PO number across all touchpoints from the moment it arrived to when it was posted to the ERP. The tracking data is what powers the Transaction Replay feature.</p>
+
+  <h3 class="sub-title">4.2 The MQ Architecture Powering APM's Internal APIs</h3>
+
+  <p>One of the most important — and least documented — architectural decisions inside Anypoint Partner Manager is that <strong>all internal service-to-service communication is built on Anypoint MQ (Message Queue) architecture</strong>. This is not an implementation detail; it is foundational to how APM achieves reliability, decoupling, and scalability at enterprise volumes.</p>
+
+  <p>When the Receive Service accepts an inbound AS2 or SFTP transmission, it does not call the Core B2B Engine directly via an HTTP synchronous call. Instead, it publishes the raw payload as a message onto an Anypoint MQ queue. The Core B2B Engine consumes from that queue asynchronously. Similarly, after transformation, the processed message is published to a second MQ queue that the Dispatch Service consumes from to deliver to the downstream ERP. The Tracking Service subscribes to audit events published at each processing stage.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-label">APM Internal MQ Architecture</div>
+    <svg width="100%" viewBox="0 0 660 310" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;font-size:11px;">
+      <defs>
+        <marker id="arr-mq" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <!-- Receive Service -->
+      <rect x="10" y="116" width="118" height="52" rx="7" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.9"/>
+      <text x="69" y="137" text-anchor="middle" font-size="11" font-weight="600" fill="#145a38">Receive Service</text>
+      <text x="69" y="153" text-anchor="middle" font-size="9" fill="#145a38">AS2 / SFTP / HTTPS</text>
+      <text x="69" y="163" text-anchor="middle" font-size="9" fill="#145a38">inbound endpoint</text>
+
+      <!-- Queue 1 -->
+      <rect x="150" y="108" width="100" height="66" rx="6" fill="#f5ebff" stroke="#9b59b6" stroke-width="1"/>
+      <text x="200" y="128" text-anchor="middle" font-size="10" font-weight="700" fill="#7d3c98">Anypoint MQ</text>
+      <text x="200" y="143" text-anchor="middle" font-size="9" fill="#7d3c98">inbound-raw-payload</text>
+      <text x="200" y="156" text-anchor="middle" font-size="9" fill="#9b59b6">Queue 1</text>
+      <!-- Queue 1 icon bars -->
+      <line x1="164" y1="166" x2="236" y2="166" stroke="#9b59b6" stroke-width="0.5" stroke-dasharray="3 2"/>
+
+      <!-- Core B2B Engine -->
+      <rect x="272" y="96" width="118" height="80" rx="7" fill="#a8e6c8" stroke="#0e6644" stroke-width="1"/>
+      <text x="331" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#0a4a2e">Core B2B Engine</text>
+      <text x="331" y="133" text-anchor="middle" font-size="9" fill="#0a4a2e">Parse · Validate</text>
+      <text x="331" y="146" text-anchor="middle" font-size="9" fill="#0a4a2e">DataWeave Map</text>
+      <text x="331" y="159" text-anchor="middle" font-size="9" fill="#0a4a2e">Generate 997 FA</text>
+      <text x="331" y="170" text-anchor="middle" font-size="9" fill="#0a4a2e">Publish audit event</text>
+
+      <!-- Queue 2 -->
+      <rect x="412" y="108" width="100" height="66" rx="6" fill="#f5ebff" stroke="#9b59b6" stroke-width="1"/>
+      <text x="462" y="128" text-anchor="middle" font-size="10" font-weight="700" fill="#7d3c98">Anypoint MQ</text>
+      <text x="462" y="143" text-anchor="middle" font-size="9" fill="#7d3c98">processed-payload</text>
+      <text x="462" y="156" text-anchor="middle" font-size="9" fill="#9b59b6">Queue 2</text>
+      <line x1="426" y1="166" x2="498" y2="166" stroke="#9b59b6" stroke-width="0.5" stroke-dasharray="3 2"/>
+
+      <!-- Dispatch Service -->
+      <rect x="534" y="116" width="118" height="52" rx="7" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.9"/>
+      <text x="593" y="137" text-anchor="middle" font-size="11" font-weight="600" fill="#145a38">Dispatch Service</text>
+      <text x="593" y="153" text-anchor="middle" font-size="9" fill="#145a38">Deliver to ERP</text>
+      <text x="593" y="163" text-anchor="middle" font-size="9" fill="#145a38">SAP / Salesforce / REST</text>
+
+      <!-- Tracking Service (below, subscribed to audit topic) -->
+      <rect x="240" y="230" width="180" height="46" rx="7" fill="#e8d5f5" stroke="#9b59b6" stroke-width="0.9"/>
+      <text x="330" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#7d3c98">Tracking Service</text>
+      <text x="330" y="265" text-anchor="middle" font-size="9" fill="#7d3c98">Subscribes to MQ audit topic</text>
+
+      <!-- Dead Letter Queue -->
+      <rect x="240" y="30" width="180" height="46" rx="7" fill="#fdf0f0" stroke="#a32020" stroke-width="0.9"/>
+      <text x="330" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#a32020">Dead Letter Queue</text>
+      <text x="330" y="65" text-anchor="middle" font-size="9" fill="#a32020">Failed messages · Retry policy</text>
+
+      <!-- Arrows -->
+      <line x1="128" y1="142" x2="149" y2="142" stroke="#1a7a4a" stroke-width="1.5" marker-end="url(#arr-mq)"/>
+      <text x="139" y="137" text-anchor="middle" font-size="9" fill="#555">publish</text>
+
+      <line x1="250" y1="142" x2="271" y2="142" stroke="#9b59b6" stroke-width="1.5" marker-end="url(#arr-mq)"/>
+      <text x="261" y="137" text-anchor="middle" font-size="9" fill="#9b59b6">consume</text>
+
+      <line x1="390" y1="142" x2="411" y2="142" stroke="#1a7a4a" stroke-width="1.5" marker-end="url(#arr-mq)"/>
+      <text x="401" y="137" text-anchor="middle" font-size="9" fill="#555">publish</text>
+
+      <line x1="512" y1="142" x2="533" y2="142" stroke="#9b59b6" stroke-width="1.5" marker-end="url(#arr-mq)"/>
+      <text x="523" y="137" text-anchor="middle" font-size="9" fill="#9b59b6">consume</text>
+
+      <!-- Audit event arrow down -->
+      <line x1="331" y1="176" x2="331" y2="229" stroke="#9b59b6" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr-mq)"/>
+      <text x="349" y="212" font-size="9" fill="#9b59b6">audit topic</text>
+
+      <!-- DLQ arrow up from queue 2 -->
+      <line x1="462" y1="108" x2="420" y2="76" stroke="#a32020" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#arr-mq)"/>
+      <text x="455" y="93" font-size="9" fill="#a32020">on failure</text>
+    </svg>
+    <p class="diagram-caption">Figure 2b — APM's internal MQ architecture. Each service communicates via Anypoint MQ queues (not direct HTTP calls), providing decoupling, buffering, retry, and a dead-letter queue for failed messages.</p>
+  </div>
+
+  <p>This MQ-based design has several important practical consequences that every APM implementer should understand:</p>
+
+  <p><strong>Decoupling and resilience.</strong> Because the Receive Service and Core B2B Engine communicate via a queue, a temporary spike in inbound EDI volume does not crash the engine — messages buffer in the queue and are processed as capacity allows. If the Dispatch Service is temporarily unavailable (e.g., an ERP maintenance window), transformed messages queue up and are delivered once the service recovers, without data loss.</p>
+
+  <p><strong>Dead Letter Queue (DLQ) handling.</strong> APM configures DLQ policies on its internal MQ queues. When a message fails processing after the configured number of retry attempts, it is moved to the DLQ rather than discarded. This is what ultimately surfaces as a "Failed" transaction in the APM monitoring dashboard — and it is what the Transaction Replay feature replays from.</p>
+
+  <p><strong>Audit trail via MQ topics.</strong> The Tracking Service is a subscriber to an internal MQ audit topic that all other services publish to at key processing milestones (received, parsed, transformed, dispatched, acked). This event-driven audit log is what gives APM its end-to-end traceability without requiring direct coupling between the processing services and the tracking database.</p>
+
+  <div class="callout callout-info">
+    <div class="callout-label">Architecture Note</div>
+    <p>Anypoint MQ is a fully managed, cloud-native messaging service that is part of the Anypoint Platform. It is distinct from on-premise message brokers like ActiveMQ or RabbitMQ. APM provisions and manages its internal MQ queues automatically — you do not configure them manually. However, understanding that they exist explains why APM exhibits the reliability and throughput characteristics it does under load.</p>
+  </div>
+
+  <!-- ─── SECTION 5 ─── -->
+  <h2 class="section-title" id="s5">5. Inbound Flow: Partner → Host (850 Purchase Order)</h2>
+
+  <p>Let us trace the full lifecycle of an inbound 850 Purchase Order — from the moment the file lands in APM to the point where a clean order record appears in your ERP. This is the most common B2B integration pattern, and understanding it deeply will help you configure APM correctly.</p>
+
+  <!-- Inbound flow diagram -->
+  <div class="diagram-wrap">
+    <div class="diagram-label">Sequence Diagram — Inbound 850</div>
+    <svg width="100%" viewBox="0 0 660 420" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;font-size:11px;">
+      <defs>
+        <marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <!-- Swimlane headers -->
+      <rect x="10" y="8" width="110" height="40" rx="6" fill="#fdf3dc" stroke="#d4900a" stroke-width="0.8"/>
+      <text x="65" y="32" text-anchor="middle" font-size="11" font-weight="600" fill="#7a4d00">Trading Partner</text>
+
+      <rect x="140" y="8" width="110" height="40" rx="6" fill="#eaf6f0" stroke="#1a7a4a" stroke-width="0.8"/>
+      <text x="195" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#145a38">APM Receive</text>
+      <text x="195" y="39" text-anchor="middle" font-size="10" fill="#145a38">Service</text>
+
+      <rect x="270" y="8" width="110" height="40" rx="6" fill="#eaf6f0" stroke="#1a7a4a" stroke-width="0.8"/>
+      <text x="325" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#145a38">Core B2B</text>
+      <text x="325" y="39" text-anchor="middle" font-size="10" fill="#145a38">Engine</text>
+
+      <rect x="400" y="8" width="110" height="40" rx="6" fill="#eaf6f0" stroke="#1a7a4a" stroke-width="0.8"/>
+      <text x="455" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#145a38">APM Dispatch</text>
+      <text x="455" y="39" text-anchor="middle" font-size="10" fill="#145a38">Service</text>
+
+      <rect x="530" y="8" width="110" height="40" rx="6" fill="#e8f4fb" stroke="#1a7fb5" stroke-width="0.8"/>
+      <text x="585" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#0d5a82">ERP / OMS</text>
+      <text x="585" y="39" text-anchor="middle" font-size="10" fill="#0d5a82">Internal System</text>
+
+      <!-- Vertical lifelines -->
+      <line x1="65" y1="48" x2="65" y2="400" stroke="#d4900a" stroke-width="0.5" stroke-dasharray="4 4"/>
+      <line x1="195" y1="48" x2="195" y2="400" stroke="#1a7a4a" stroke-width="0.5" stroke-dasharray="4 4"/>
+      <line x1="325" y1="48" x2="325" y2="400" stroke="#1a7a4a" stroke-width="0.5" stroke-dasharray="4 4"/>
+      <line x1="455" y1="48" x2="455" y2="400" stroke="#1a7a4a" stroke-width="0.5" stroke-dasharray="4 4"/>
+      <line x1="585" y1="48" x2="585" y2="400" stroke="#1a7fb5" stroke-width="0.5" stroke-dasharray="4 4"/>
+
+      <!-- Step 1: Send AS2 -->
+      <line x1="65" y1="80" x2="192" y2="80" stroke="#d4900a" stroke-width="1.5" marker-end="url(#arr3)"/>
+      <rect x="85" y="66" width="100" height="18" rx="3" fill="white"/>
+      <text x="135" y="79" text-anchor="middle" font-size="10" fill="#555">1. POST AS2 (850)</text>
+
+      <!-- Step 2: MDN -->
+      <line x1="193" y1="100" x2="68" y2="100" stroke="#1a7a4a" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr3)"/>
+      <rect x="83" y="87" width="100" height="18" rx="3" fill="white"/>
+      <text x="133" y="100" text-anchor="middle" font-size="10" fill="#555">2. AS2 MDN (200 OK)</text>
+
+      <!-- Step 3: Parse -->
+      <line x1="195" y1="130" x2="322" y2="130" stroke="#1a7a4a" stroke-width="1.5" marker-end="url(#arr3)"/>
+      <rect x="212" y="118" width="100" height="18" rx="3" fill="white"/>
+      <text x="262" y="131" text-anchor="middle" font-size="10" fill="#555">3. Parse EDI X12</text>
+
+      <!-- Step 4: Validate -->
+      <rect x="298" y="148" width="54" height="18" rx="3" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.5"/>
+      <text x="325" y="161" text-anchor="middle" font-size="10" fill="#145a38">4. Validate</text>
+
+      <!-- Step 5: 997 ack back -->
+      <line x1="323" y1="178" x2="198" y2="178" stroke="#1a7a4a" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr3)"/>
+      <rect x="212" y="166" width="100" height="18" rx="3" fill="white"/>
+      <text x="262" y="179" text-anchor="middle" font-size="10" fill="#555">5. 997 Functional Ack</text>
+
+      <!-- Step 6: DataWeave transform -->
+      <rect x="298" y="196" width="54" height="18" rx="3" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.5"/>
+      <text x="325" y="209" text-anchor="middle" font-size="10" fill="#145a38">6. DW Map</text>
+
+      <!-- Step 7: Log payload -->
+      <line x1="325" y1="226" x2="325" y2="246" stroke="#9b59b6" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#arr3)"/>
+      <text x="340" y="241" font-size="10" fill="#9b59b6">7. Store payload (S3)</text>
+
+      <!-- Step 8: Forward to dispatch -->
+      <line x1="325" y1="266" x2="452" y2="266" stroke="#1a7a4a" stroke-width="1.5" marker-end="url(#arr3)"/>
+      <rect x="340" y="254" width="98" height="18" rx="3" fill="white"/>
+      <text x="389" y="267" text-anchor="middle" font-size="10" fill="#555">8. JSON order payload</text>
+
+      <!-- Step 9: Post to ERP -->
+      <line x1="455" y1="296" x2="582" y2="296" stroke="#1a7fb5" stroke-width="1.5" marker-end="url(#arr3)"/>
+      <rect x="460" y="284" width="115" height="18" rx="3" fill="white"/>
+      <text x="517" y="297" text-anchor="middle" font-size="10" fill="#555">9. POST /api/orders</text>
+
+      <!-- Step 10: ERP confirms -->
+      <line x1="583" y1="316" x2="458" y2="316" stroke="#1a7fb5" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr3)"/>
+      <rect x="460" y="304" width="115" height="18" rx="3" fill="white"/>
+      <text x="517" y="317" text-anchor="middle" font-size="10" fill="#555">10. 201 Created (SO-4421)</text>
+
+      <!-- Step 11: Track -->
+      <rect x="180" y="344" width="320" height="22" rx="4" fill="#f5ebff" stroke="#9b59b6" stroke-width="0.5"/>
+      <text x="340" y="359" text-anchor="middle" font-size="10" fill="#7d3c98">11. Tracking Service logs transmission + transaction metadata</text>
+
+      <!-- Step numbering guide -->
+      <text x="65" y="395" text-anchor="middle" font-size="9" fill="#aaa">Partner</text>
+      <text x="195" y="395" text-anchor="middle" font-size="9" fill="#aaa">Receive</text>
+      <text x="325" y="395" text-anchor="middle" font-size="9" fill="#aaa">Engine</text>
+      <text x="455" y="395" text-anchor="middle" font-size="9" fill="#aaa">Dispatch</text>
+      <text x="585" y="395" text-anchor="middle" font-size="9" fill="#aaa">ERP</text>
+    </svg>
+    <p class="diagram-caption">Figure 3 — Inbound 850 Purchase Order sequence: 11 steps from AS2 POST to ERP order creation. Note the 997 Functional Acknowledgement returned after parsing (step 5).</p>
+  </div>
+
+  <p>A few things worth highlighting in this flow:</p>
+
+  <p><strong>The AS2 MDN</strong> (step 2) is a transport-level acknowledgement returned synchronously. It simply confirms that the bytes arrived intact. This is separate from the 997 Functional Acknowledgement (step 5), which confirms EDI syntactic validity. Both are automatic in APM — you do not write code for either.</p>
+
+  <p><strong>Payload storage</strong> (step 7) captures the raw EDI payload in your configured storage (S3, Azure Blob). This is what enables Transaction Replay later — if the ERP API is down at step 9, you can replay the transaction from the stored payload once it recovers, without asking the partner to resend.</p>
+
+  <div class="callout callout-success">
+    <div class="callout-label">APM Advantage</div>
+    <p>The 997 Functional Acknowledgement is generated and transmitted automatically by APM based on parsing results. You do not need to write a separate Mule flow or DataWeave script to produce it. This alone saves significant implementation time for every EDI partner onboarded.</p>
+  </div>
+
+  <!-- ─── SECTION 6 ─── -->
+  <h2 class="section-title" id="s6">6. Outbound Flow: Host → Partner (810 Invoice &amp; 856 ASN)</h2>
+
+  <p>Outbound flows are the reverse: your internal system (ERP, WMS, OMS) generates a business event (order shipped, invoice ready), which triggers APM to transform that event into EDI and transmit it to the trading partner. Let us look at the 856 ASN, which is one of the most operationally critical outbound documents.</p>
+
+  <div class="callout callout-warn">
+    <div class="callout-label">Why the 856 ASN Matters</div>
+    <p>Major retailers (Amazon, Walmart, Target) require an 856 ASN to arrive <em>before</em> the physical shipment. Failure to transmit an ASN on time — or transmitting one with incorrect SSCC-18 pallet labels — results in compliance chargebacks that can run 2-3% of invoice value. In a $50M supplier relationship, that is real money. APM's automated outbound flow eliminates the human error and timing risk in this process.</p>
+  </div>
+
+  <!-- Outbound flow diagram -->
+  <div class="diagram-wrap">
+    <div class="diagram-label">Outbound 856 ASN Flow</div>
+    <svg width="100%" viewBox="0 0 660 280" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;font-size:11px;">
+      <defs>
+        <marker id="arr4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <!-- Boxes -->
+      <rect x="10" y="40" width="120" height="54" rx="7" fill="#e8f4fb" stroke="#1a7fb5" stroke-width="0.9"/>
+      <text x="70" y="62" text-anchor="middle" font-size="11" font-weight="600" fill="#0d5a82">WMS</text>
+      <text x="70" y="78" text-anchor="middle" font-size="10" fill="#0d5a82">Shipment confirmed</text>
+      <text x="70" y="91" text-anchor="middle" font-size="10" fill="#0d5a82">SSCC-18 generated</text>
+
+      <rect x="160" y="40" width="130" height="54" rx="7" fill="#eaf6f0" stroke="#1a7a4a" stroke-width="0.9"/>
+      <text x="225" y="62" text-anchor="middle" font-size="11" font-weight="600" fill="#145a38">APM Source</text>
+      <text x="225" y="78" text-anchor="middle" font-size="10" fill="#145a38">at Host endpoint</text>
+      <text x="225" y="91" text-anchor="middle" font-size="10" fill="#145a38">HTTP/SFTP listener</text>
+
+      <rect x="320" y="40" width="130" height="54" rx="7" fill="#eaf6f0" stroke="#1a7a4a" stroke-width="0.9"/>
+      <text x="385" y="62" text-anchor="middle" font-size="11" font-weight="600" fill="#145a38">Core B2B Engine</text>
+      <text x="385" y="78" text-anchor="middle" font-size="10" fill="#145a38">JSON → EDI 856</text>
+      <text x="385" y="91" text-anchor="middle" font-size="10" fill="#145a38">DataWeave map</text>
+
+      <rect x="480" y="40" width="165" height="54" rx="7" fill="#fdf3dc" stroke="#d4900a" stroke-width="0.9"/>
+      <text x="563" y="62" text-anchor="middle" font-size="11" font-weight="600" fill="#7a4d00">Trading Partner</text>
+      <text x="563" y="78" text-anchor="middle" font-size="10" fill="#7a4d00">Receiving dock system</text>
+      <text x="563" y="91" text-anchor="middle" font-size="10" fill="#7a4d00">via AS2 or SFTP</text>
+
+      <!-- Flow arrows -->
+      <line x1="130" y1="67" x2="158" y2="67" stroke="#1a7fb5" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <text x="144" y="62" text-anchor="middle" font-size="9" fill="#555">JSON</text>
+
+      <line x1="290" y1="67" x2="318" y2="67" stroke="#1a7a4a" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <text x="304" y="62" text-anchor="middle" font-size="9" fill="#555">route</text>
+
+      <line x1="450" y1="67" x2="478" y2="67" stroke="#1a7a4a" stroke-width="1.5" marker-end="url(#arr4)"/>
+      <text x="464" y="62" text-anchor="middle" font-size="9" fill="#555">X12 856</text>
+
+      <!-- AS2 MDN back -->
+      <line x1="560" y1="100" x2="488" y2="130" stroke="#d4900a" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr4)"/>
+      <text x="535" y="125" text-anchor="middle" font-size="9" fill="#d4900a">MDN ack</text>
+
+      <!-- Payload store -->
+      <rect x="310" y="150" width="150" height="38" rx="6" fill="#f5ebff" stroke="#9b59b6" stroke-width="0.7"/>
+      <text x="385" y="165" text-anchor="middle" font-size="10" font-weight="600" fill="#7d3c98">Payload Storage</text>
+      <text x="385" y="180" text-anchor="middle" font-size="10" fill="#7d3c98">S3 / Azure Blob</text>
+      <line x1="385" y1="94" x2="385" y2="150" stroke="#9b59b6" stroke-width="0.8" stroke-dasharray="3 3" marker-end="url(#arr4)"/>
+
+      <!-- Tracking -->
+      <rect x="130" y="210" width="400" height="38" rx="6" fill="#f5ebff" stroke="#9b59b6" stroke-width="0.7"/>
+      <text x="330" y="225" text-anchor="middle" font-size="10" font-weight="600" fill="#7d3c98">Tracking Service</text>
+      <text x="330" y="240" text-anchor="middle" font-size="10" fill="#7d3c98">Logs transmission ID, partner ID, doc type, timestamp, MDN status</text>
+    </svg>
+    <p class="diagram-caption">Figure 4 — Outbound 856 ASN: JSON shipment data from WMS is transformed to EDI X12, stored in payload storage, and transmitted to the partner via AS2 or SFTP.</p>
+  </div>
+
+  <!-- ─── SECTION 7 ─── -->
+  <h2 class="section-title" id="s7">7. Transport Protocols: AS2, SFTP, HTTPS</h2>
+
+  <p>The transport layer is often underestimated. Getting the message semantics right (correct EDI segments) is important, but if the transport is misconfigured, the message never arrives. APM supports three primary transport mechanisms for EDI, each with its own characteristics and security model.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-label">Transport Protocol Comparison</div>
+    <svg width="100%" viewBox="0 0 660 240" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;font-size:11px;">
+      <!-- AS2 card -->
+      <rect x="20" y="20" width="190" height="200" rx="8" fill="#e8f4fb" stroke="#1a7fb5" stroke-width="1"/>
+      <rect x="20" y="20" width="190" height="36" rx="8" fill="#1a7fb5"/>
+      <rect x="20" y="44" width="190" height="12" fill="#1a7fb5"/>
+      <text x="115" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="white">AS2</text>
+      <text x="115" y="72" text-anchor="middle" font-size="10" fill="#0d5a82" font-weight="600">Applicability Statement 2</text>
+      <text x="35" y="95" font-size="10" fill="#444">✔ HTTPS-based</text>
+      <text x="35" y="113" font-size="10" fill="#444">✔ S/MIME encryption</text>
+      <text x="35" y="131" font-size="10" fill="#444">✔ Digital signatures</text>
+      <text x="35" y="149" font-size="10" fill="#444">✔ MDN acknowledgement</text>
+      <text x="35" y="167" font-size="10" fill="#444">✔ Real-time/synchronous</text>
+      <text x="35" y="185" font-size="10" fill="#888">Best for: retail, mfg</text>
+      <text x="35" y="200" font-size="10" fill="#888">Required by many major</text>
+      <text x="35" y="213" font-size="10" fill="#888">retailers (Walmart, Amazon)</text>
+
+      <!-- SFTP card -->
+      <rect x="234" y="20" width="190" height="200" rx="8" fill="#eaf6f0" stroke="#1a7a4a" stroke-width="1"/>
+      <rect x="234" y="20" width="190" height="36" rx="8" fill="#1a7a4a"/>
+      <rect x="234" y="44" width="190" height="12" fill="#1a7a4a"/>
+      <text x="329" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="white">SFTP</text>
+      <text x="329" y="72" text-anchor="middle" font-size="10" fill="#145a38" font-weight="600">Secure File Transfer Protocol</text>
+      <text x="249" y="95" font-size="10" fill="#444">✔ SSH-based encryption</text>
+      <text x="249" y="113" font-size="10" fill="#444">✔ Public key auth</text>
+      <text x="249" y="131" font-size="10" fill="#444">✔ Batch file delivery</text>
+      <text x="249" y="149" font-size="10" fill="#444">✔ Pull (polling) model</text>
+      <text x="249" y="167" font-size="10" fill="#444">✔ Wide partner support</text>
+      <text x="249" y="185" font-size="10" fill="#888">Best for: legacy systems,</text>
+      <text x="249" y="200" font-size="10" fill="#888">high-volume batch,</text>
+      <text x="249" y="213" font-size="10" fill="#888">financial services</text>
+
+      <!-- HTTPS/REST card -->
+      <rect x="448" y="20" width="190" height="200" rx="8" fill="#fdf3dc" stroke="#d4900a" stroke-width="1"/>
+      <rect x="448" y="20" width="190" height="36" rx="8" fill="#d4900a"/>
+      <rect x="448" y="44" width="190" height="12" fill="#d4900a"/>
+      <text x="543" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="white">HTTPS / REST</text>
+      <text x="543" y="72" text-anchor="middle" font-size="10" fill="#7a4d00" font-weight="600">API-based exchange</text>
+      <text x="463" y="95" font-size="10" fill="#444">✔ TLS 1.2/1.3 transport</text>
+      <text x="463" y="113" font-size="10" fill="#444">✔ OAuth 2.0 / API keys</text>
+      <text x="463" y="131" font-size="10" fill="#444">✔ JSON / XML payloads</text>
+      <text x="463" y="149" font-size="10" fill="#444">✔ Real-time, event-driven</text>
+      <text x="463" y="167" font-size="10" fill="#444">✔ Modern partner APIs</text>
+      <text x="463" y="185" font-size="10" fill="#888">Best for: digital-native</text>
+      <text x="463" y="200" font-size="10" fill="#888">partners, microservices,</text>
+      <text x="463" y="213" font-size="10" fill="#888">SaaS platforms</text>
+    </svg>
+    <p class="diagram-caption">Figure 5 — APM supports three primary transport protocols. A single APM deployment can handle all three simultaneously, allowing you to meet each partner's technology preferences.</p>
+  </div>
+
+  <p>One of APM's major advantages is that it abstracts the transport layer away from the message logic. A change from SFTP to AS2 for a specific partner requires a configuration change in the APM UI — not a code change in your Mule application. The business logic (the DataWeave map) remains completely unchanged.</p>
+
+  <!-- ─── SECTION 8 ─── -->
+  <h2 class="section-title" id="s8">8. Partner Onboarding: Step-by-Step</h2>
+
+  <p>One of the biggest operational pain points in traditional B2B integration is partner onboarding. Custom-built EDI systems often require weeks of back-and-forth between integration developers, operations teams, and the partner's technical contacts. APM reduces this significantly through a guided, configuration-driven workflow.</p>
+
+  <h3 class="sub-title">8.1 The Onboarding Checklist</h3>
+
+  <ol class="steps">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Configure Your Host Profile</strong>
+        <p>Set up your organisation's identity: ISA06 (Interchange Sender ID), GS02 (Application Sender Code), AS2 ID, and upload your AS2 certificate. This is done once per APM instance.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Create the Partner Profile</strong>
+        <p>Enter the partner's ISA/GS identifiers. For AS2, exchange and upload their public certificate. Define their communication preferences (AS2, SFTP, HTTPS). Add their contact information for operational escalation.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Define Message Types</strong>
+        <p>For each document type you will exchange (850, 856, 810), create a message type definition specifying the X12 version, transaction set number, and direction. Attach the DataWeave transformation map and any custom message attributes (Order Number, Invoice Number) you want extracted for tracking.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <strong>Configure Endpoints</strong>
+        <p>For inbound: define the AS2 or SFTP listener endpoint APM will expose. For outbound: provide the partner's AS2 URL and certificate, or SFTP host/credentials. APM creates and manages these endpoints on CloudHub.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <strong>Create and Deploy Message Flows</strong>
+        <p>Combine partner + endpoint + message type(s) into a message flow. Clicking "Deploy" in the UI triggers APM to provision and start the actual Mule applications on CloudHub. No Anypoint Studio work required for standard EDI flows.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <strong>Test with Sample Transactions</strong>
+        <p>Send test EDI files through the configured endpoint and verify they appear in the APM monitoring dashboard. Confirm the 997 FA is returned, the DataWeave output matches expectations, and the downstream system receives the correct payload.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <strong>Go Live &amp; Monitor</strong>
+        <p>Promote the message flow from sandbox to production. Set up alert rules for failed transactions. Business users can now self-service transaction monitoring without IT involvement.</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="callout callout-info">
+    <div class="callout-label">Time Savings</div>
+    <p>Traditional EDI onboarding with a custom-built integration typically takes 4–8 weeks per partner. With APM's configuration-driven approach, a standard EDI partner (X12 over AS2) can be onboarded in 3–5 days. For repeat partner templates (same retailer, different supplier), this drops to under a day.</p>
+  </div>
+
+  <!-- ─── SECTION 9 ─── -->
+  <h2 class="section-title" id="s9">9. DataWeave Mapping: EDI → JSON</h2>
+
+  <p>DataWeave is MuleSoft's data transformation language. In the context of APM, it is the bridge between the rigid, segment-based world of EDI and the flexible, schema-agnostic world of internal APIs and ERP systems. Every inbound EDI transaction needs a DataWeave map that converts the parsed EDI structure into your target format.</p>
+
+  <h3 class="sub-title">9.1 How APM Parses EDI</h3>
+
+  <p>Before DataWeave runs, the X12 EDI Connector (automatically provisioned by APM) parses the raw EDI text into a structured Mule message. The parsed X12 document is accessible as a Java map — segment names as keys, element arrays as values. DataWeave then operates on this structured object.</p>
+
+  <div class="code-header">
+    <div><div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div></div>
+    <div>transform_850_to_order_json.dwl — DataWeave 2.0</div>
+  </div>
+  <pre>
+<span class="cmt">// APM DataWeave map: X12 850 Purchase Order → Internal Order JSON</span>
+<span class="cmt">// This map runs inside the Core B2B Engine after EDI parsing</span>
+<span class="kw">%dw</span> <span class="val">2.0</span>
+<span class="kw">output</span> application/json
+
+<span class="cmt">// Helper: extract a specific element loop by qualifier</span>
+<span class="kw">fun</span> <span class="fn">findN1</span>(loops, qualifier) =
+  (loops <span class="kw">filter</span> (l) -> l.<span class="val">"N1"</span>[<span class="val">0</span>].<span class="val">"N101"</span>[<span class="val">0</span>] == qualifier)[<span class="val">0</span>]
+
+<span class="kw">var</span> txnSet  = payload.<span class="val">"TransactionSets"</span>.<span class="val">"detail"</span>[<span class="val">0</span>]
+<span class="kw">var</span> beg     = txnSet.<span class="val">"BEG"</span>[<span class="val">0</span>]
+<span class="kw">var</span> n1Loops = txnSet.<span class="val">"N1Loop"</span> <span class="kw">default</span> []
+<span class="kw">var</span> po1Loop = txnSet.<span class="val">"PO1Loop"</span> <span class="kw">default</span> []
+<span class="kw">var</span> shipTo  = <span class="fn">findN1</span>(n1Loops, <span class="str">"ST"</span>)
+<span class="kw">var</span> billTo  = <span class="fn">findN1</span>(n1Loops, <span class="str">"BT"</span>)
+---
+{
+  <span class="key">purchaseOrderNumber</span>: beg.<span class="val">"BEG03"</span>[<span class="val">0</span>],
+  <span class="key">orderDate</span>:          beg.<span class="val">"BEG05"</span>[<span class="val">0</span>] <span class="kw">as</span> Date {format: <span class="str">"yyyyMMdd"</span>},
+  <span class="key">orderType</span>:          beg.<span class="val">"BEG02"</span>[<span class="val">0</span>],
+
+  <span class="key">shipTo</span>: {
+    <span class="key">name</span>:   shipTo.<span class="val">"N1"</span>[<span class="val">0</span>].<span class="val">"N102"</span>[<span class="val">0</span>],
+    <span class="key">code</span>:   shipTo.<span class="val">"N1"</span>[<span class="val">0</span>].<span class="val">"N104"</span>[<span class="val">0</span>],
+    <span class="key">street</span>: shipTo.<span class="val">"N3"</span>[<span class="val">0</span>].<span class="val">"N301"</span>[<span class="val">0</span>],
+    <span class="key">city</span>:   shipTo.<span class="val">"N4"</span>[<span class="val">0</span>].<span class="val">"N401"</span>[<span class="val">0</span>],
+    <span class="key">state</span>:  shipTo.<span class="val">"N4"</span>[<span class="val">0</span>].<span class="val">"N402"</span>[<span class="val">0</span>],
+    <span class="key">zip</span>:    shipTo.<span class="val">"N4"</span>[<span class="val">0</span>].<span class="val">"N403"</span>[<span class="val">0</span>]
+  },
+
+  <span class="key">billTo</span>: {
+    <span class="key">name</span>:   billTo.<span class="val">"N1"</span>[<span class="val">0</span>].<span class="val">"N102"</span>[<span class="val">0</span>] <span class="kw">default</span> <span class="str">""</span>,
+    <span class="key">code</span>:   billTo.<span class="val">"N1"</span>[<span class="val">0</span>].<span class="val">"N104"</span>[<span class="val">0</span>] <span class="kw">default</span> <span class="str">""</span>
+  },
+
+  <span class="key">lineItems</span>: po1Loop <span class="kw">map</span> (line, idx) -> {
+    <span class="key">lineNumber</span>:    line.<span class="val">"PO1"</span>[<span class="val">0</span>].<span class="val">"PO101"</span>[<span class="val">0</span>] <span class="kw">as</span> Number,
+    <span class="key">quantity</span>:      line.<span class="val">"PO1"</span>[<span class="val">0</span>].<span class="val">"PO102"</span>[<span class="val">0</span>] <span class="kw">as</span> Number,
+    <span class="key">unitOfMeasure</span>: line.<span class="val">"PO1"</span>[<span class="val">0</span>].<span class="val">"PO103"</span>[<span class="val">0</span>],
+    <span class="key">unitPrice</span>:     line.<span class="val">"PO1"</span>[<span class="val">0</span>].<span class="val">"PO104"</span>[<span class="val">0</span>] <span class="kw">as</span> Number,
+    <span class="key">vendorPartNum</span>: line.<span class="val">"PO1"</span>[<span class="val">0</span>].<span class="val">"PO107"</span>[<span class="val">0</span>],
+    <span class="key">upc</span>:           line.<span class="val">"PO1"</span>[<span class="val">0</span>].<span class="val">"PO109"</span>[<span class="val">0</span>],
+    <span class="key">description</span>:  (line.<span class="val">"PID"</span> <span class="kw">default</span> [{}])[<span class="val">0</span>].<span class="val">"PID05"</span>[<span class="val">0</span>] <span class="kw">default</span> <span class="str">""</span>,
+    <span class="key">extendedPrice</span>: (line.<span class="val">"PO1"</span>[<span class="val">0</span>].<span class="val">"PO102"</span>[<span class="val">0</span>] <span class="kw">as</span> Number)
+                   * (line.<span class="val">"PO1"</span>[<span class="val">0</span>].<span class="val">"PO104"</span>[<span class="val">0</span>] <span class="kw">as</span> Number)
+  },
+
+  <span class="key">orderTotal</span>:  txnSet.<span class="val">"AMT"</span>[<span class="val">0</span>].<span class="val">"AMT02"</span>[<span class="val">0</span>] <span class="kw">as</span> Number,
+  <span class="key">lineCount</span>:   txnSet.<span class="val">"CTT"</span>[<span class="val">0</span>].<span class="val">"CTT01"</span>[<span class="val">0</span>] <span class="kw">as</span> Number,
+
+  <span class="cmt">// Metadata for downstream systems</span>
+  <span class="key">source</span>: {
+    <span class="key">ediStandard</span>:  <span class="str">"X12"</span>,
+    <span class="key">version</span>:      <span class="str">"004030"</span>,
+    <span class="key">partnerISA06</span>: payload.<span class="val">"ISA"</span>.<span class="val">"ISA06"</span>[<span class="val">0</span>] <span class="kw">trim</span>,
+    <span class="key">receivedAt</span>:   now()
+  }
+}
+  </pre>
+
+  <p>The resulting JSON is clean, strongly typed, and ready for your ERP's order management API. No EDI knowledge is required downstream — the complexity is fully contained within APM's transformation layer.</p>
+
+  <h3 class="sub-title">9.2 Outbound: JSON → EDI 856 ASN</h3>
+
+  <p>The reverse transformation — taking a JSON shipment payload from your WMS and producing a syntactically correct EDI 856 — is equally important. APM's DataWeave for outbound maps follows the same pattern but in reverse, constructing EDI segment objects that the X12 Connector serialises into the final flat EDI text.</p>
+
+  <div class="code-header">
+    <div><div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div></div>
+    <div>transform_shipment_to_856.dwl — Outbound DataWeave (excerpt)</div>
+  </div>
+  <pre>
+<span class="kw">%dw</span> <span class="val">2.0</span>
+<span class="kw">output</span> application/edi-x12  <span class="cmt">// APM X12 Connector output format</span>
+---
+{
+  <span class="key">TransactionSets</span>: {
+    <span class="key">v004030</span>: {
+      <span class="key">"856"</span>: [{
+        <span class="key">BSN</span>: [{
+          <span class="val">"BSN01"</span>: <span class="str">"00"</span>,           <span class="cmt">// Purpose: Original</span>
+          <span class="val">"BSN02"</span>: payload.shipmentId,
+          <span class="val">"BSN03"</span>: now() <span class="kw">as</span> String {format: <span class="str">"yyyyMMdd"</span>},
+          <span class="val">"BSN04"</span>: now() <span class="kw">as</span> String {format: <span class="str">"HHmm"</span>},
+          <span class="val">"BSN05"</span>: <span class="str">"0001"</span>
+        }],
+        <span class="key">HLLoop</span>: [
+          <span class="cmt">// Shipment level HL</span>
+          {
+            <span class="key">HL</span>: [{<span class="val">"HL01"</span>:<span class="str">"1"</span>, <span class="val">"HL03"</span>:<span class="str">"S"</span>}],
+            <span class="key">TD1</span>: [{<span class="val">"TD101"</span>:<span class="str">"CTN"</span>, <span class="val">"TD102"</span>: payload.totalCartons}],
+            <span class="key">TD5</span>: [{<span class="val">"TD501"</span>:<span class="str">"B"</span>, <span class="val">"TD503"</span>: payload.carrierSCAC,
+                    <span class="val">"TD504"</span>:<span class="str">"LT"</span>, <span class="val">"TD505"</span>: payload.proNumber}],
+            <span class="cmt">// Order level HL loops (nested)</span>
+            <span class="key">HLLoop</span>: payload.orders <span class="kw">map</span> (ord, oi) -> {
+              <span class="key">HL</span>: [{<span class="val">"HL01"</span>: (oi+<span class="val">2</span>)<span class="kw">as</span> String, <span class="val">"HL02"</span>:<span class="str">"1"</span>, <span class="val">"HL03"</span>:<span class="str">"O"</span>}],
+              <span class="key">PRF</span>: [{<span class="val">"PRF01"</span>: ord.purchaseOrderNumber}]
+            }
+          }
+        ]
+      }]
+    }
+  }
+}
+  </pre>
+
+  <!-- ─── SECTION 10 ─── -->
+  <h2 class="section-title" id="s10">10. Monitoring, Replay &amp; Operations</h2>
+
+  <p>One of the most underrated strengths of APM is its operational toolset. EDI problems happen constantly in production — a partner sends a malformed 850, your ERP API has a 30-minute outage, a shipment is sent with the wrong ship-to code. Without good operational tooling, resolving these issues is slow, manual, and error-prone. APM's monitoring console was designed specifically for this environment.</p>
+
+  <h3 class="sub-title">10.1 The Monitoring Dashboard</h3>
+
+  <p>The APM monitoring dashboard provides end-to-end visibility at three levels:</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-label">Monitoring Dashboard — Conceptual Layout</div>
+    <svg width="100%" viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;font-size:11px;">
+      <!-- Main container -->
+      <rect x="10" y="10" width="640" height="300" rx="10" fill="#1e2636" stroke="#2d3748" stroke-width="1"/>
+      <!-- Header bar -->
+      <rect x="10" y="10" width="640" height="40" rx="10" fill="#161d2a"/>
+      <rect x="10" y="38" width="640" height="12" fill="#161d2a"/>
+      <text x="30" y="36" font-size="13" font-weight="700" fill="#e6edf3">APM Transaction Monitor</text>
+      <text x="540" y="36" font-size="11" fill="#8b949e">Last 24 hours</text>
+      <!-- Stat cards -->
+      <rect x="22" y="62" width="140" height="60" rx="6" fill="#0d2240" stroke="#2d3748" stroke-width="0.5"/>
+      <text x="92" y="83" text-anchor="middle" font-size="11" fill="#8b949e">Transmissions</text>
+      <text x="92" y="108" text-anchor="middle" font-size="22" font-weight="700" fill="#7ee787">1,284</text>
+
+      <rect x="170" y="62" width="140" height="60" rx="6" fill="#0d2240" stroke="#2d3748" stroke-width="0.5"/>
+      <text x="240" y="83" text-anchor="middle" font-size="11" fill="#8b949e">Transactions</text>
+      <text x="240" y="108" text-anchor="middle" font-size="22" font-weight="700" fill="#7ee787">4,871</text>
+
+      <rect x="318" y="62" width="140" height="60" rx="6" fill="#0d2240" stroke="#2d3748" stroke-width="0.5"/>
+      <text x="388" y="83" text-anchor="middle" font-size="11" fill="#8b949e">Errors</text>
+      <text x="388" y="108" text-anchor="middle" font-size="22" font-weight="700" fill="#f0883e">12</text>
+
+      <rect x="466" y="62" width="172" height="60" rx="6" fill="#0d2240" stroke="#2d3748" stroke-width="0.5"/>
+      <text x="552" y="83" text-anchor="middle" font-size="11" fill="#8b949e">Success Rate</text>
+      <text x="552" y="108" text-anchor="middle" font-size="22" font-weight="700" fill="#7ee787">99.75%</text>
+
+      <!-- Transaction table -->
+      <rect x="22" y="134" width="616" height="24" rx="3" fill="#161d2a"/>
+      <text x="40" y="150" font-size="10" font-weight="600" fill="#8b949e">TIMESTAMP</text>
+      <text x="150" y="150" font-size="10" font-weight="600" fill="#8b949e">PARTNER</text>
+      <text x="290" y="150" font-size="10" font-weight="600" fill="#8b949e">DOC TYPE</text>
+      <text x="390" y="150" font-size="10" font-weight="600" fill="#8b949e">TRANS. SET #</text>
+      <text x="490" y="150" font-size="10" font-weight="600" fill="#8b949e">STATUS</text>
+      <text x="580" y="150" font-size="10" font-weight="600" fill="#8b949e">ACTION</text>
+
+      <!-- Row 1 -->
+      <rect x="22" y="158" width="616" height="24" rx="0" fill="rgba(255,255,255,0.02)"/>
+      <text x="40" y="174" font-size="10" fill="#c9d1d9">09:14:32</text>
+      <text x="150" y="174" font-size="10" fill="#c9d1d9">ACME-RETAIL</text>
+      <text x="290" y="174" font-size="10" fill="#79b8ff">X12 850</text>
+      <text x="390" y="174" font-size="10" fill="#c9d1d9">PO-2026-00421</text>
+      <rect x="490" y="163" width="55" height="16" rx="8" fill="#1a4a2e"/>
+      <text x="517" y="175" text-anchor="middle" font-size="10" fill="#7ee787">SUCCESS</text>
+      <text x="580" y="174" font-size="10" fill="#79b8ff">View</text>
+
+      <!-- Row 2 -->
+      <rect x="22" y="182" width="616" height="24" rx="0" fill="rgba(0,0,0,0.2)"/>
+      <text x="40" y="198" font-size="10" fill="#c9d1d9">09:10:18</text>
+      <text x="150" y="198" font-size="10" fill="#c9d1d9">SPORTSBRAND</text>
+      <text x="290" y="198" font-size="10" fill="#79b8ff">X12 810</text>
+      <text x="390" y="198" font-size="10" fill="#c9d1d9">INV-88742</text>
+      <rect x="490" y="187" width="55" height="16" rx="8" fill="#4a1800"/>
+      <text x="517" y="199" text-anchor="middle" font-size="10" fill="#f0883e">FAILED</text>
+      <text x="580" y="198" font-size="10" fill="#f0883e">Replay ↻</text>
+
+      <!-- Row 3 -->
+      <rect x="22" y="206" width="616" height="24" rx="0" fill="rgba(255,255,255,0.02)"/>
+      <text x="40" y="222" font-size="10" fill="#c9d1d9">08:58:44</text>
+      <text x="150" y="222" font-size="10" fill="#c9d1d9">GLOBALLOGISTICS</text>
+      <text x="290" y="222" font-size="10" fill="#79b8ff">X12 856</text>
+      <text x="390" y="222" font-size="10" fill="#c9d1d9">SHIP-20260330-009</text>
+      <rect x="490" y="211" width="55" height="16" rx="8" fill="#1a4a2e"/>
+      <text x="517" y="223" text-anchor="middle" font-size="10" fill="#7ee787">SUCCESS</text>
+      <text x="580" y="222" font-size="10" fill="#79b8ff">View</text>
+
+      <!-- Row 4 -->
+      <rect x="22" y="230" width="616" height="24" rx="0" fill="rgba(0,0,0,0.2)"/>
+      <text x="40" y="246" font-size="10" fill="#c9d1d9">08:45:02</text>
+      <text x="150" y="246" font-size="10" fill="#c9d1d9">ACME-RETAIL</text>
+      <text x="290" y="246" font-size="10" fill="#79b8ff">X12 997</text>
+      <text x="390" y="246" font-size="10" fill="#c9d1d9">FA-for-ISA-012</text>
+      <rect x="490" y="235" width="55" height="16" rx="8" fill="#1a4a2e"/>
+      <text x="517" y="247" text-anchor="middle" font-size="10" fill="#7ee787">SUCCESS</text>
+      <text x="580" y="246" font-size="10" fill="#79b8ff">View</text>
+
+      <!-- Bottom note -->
+      <text x="340" y="300" text-anchor="middle" font-size="10" fill="#8b949e">Showing 4 of 4,871 transactions · Search by partner, doc type, PO number, or status</text>
+    </svg>
+    <p class="diagram-caption">Figure 6 — APM monitoring dashboard showing real-time transaction status. The "Replay ↻" action on the failed 810 invoice allows operations to resubmit without partner involvement.</p>
+  </div>
+
+  <h3 class="sub-title">10.2 Transaction Replay</h3>
+
+  <p>Transaction Replay is one of APM's most operationally valuable features. When a transaction fails — because of a downstream system outage, a temporary network issue, or a validation error in your target ERP — you can replay it directly from the APM console, using the stored payload. No need to ask the partner to resend. No need to write a compensating Mule flow.</p>
+
+  <p>The replay feature works because APM always stores the raw inbound payload in your configured storage bucket (S3 or Azure Blob) before passing it to the processing pipeline. This idempotency guarantee is what makes the replay safe.</p>
+
+  <div class="callout callout-warn">
+    <div class="callout-label">Important Gotcha</div>
+    <p>Transaction Replay is designed for failures on <em>your</em> side (ERP unavailable, map error, etc). If the EDI itself was syntactically invalid, you will need to work with the partner to resend a corrected file — there is nothing to replay in that case. Make sure your 997 FA response codes clearly communicate rejection reasons to help partners fix their files quickly.</p>
+  </div>
+
+  <!-- ─── SECTION 11 ─── -->
+  <h2 class="section-title" id="s11">11. Real-World Use Case: Retailer Order-to-Cash</h2>
+
+  <p>Let us step away from the abstract and look at how APM works in a real, well-documented industry vertical: <strong>automotive parts manufacturing and distribution</strong>. This is one of the most EDI-intensive sectors in the world, and the integration patterns here directly apply to retail, healthcare, and financial services.</p>
+
+  <h3 class="sub-title">11.1 Real-World Scenario: Automotive Tier-1 Supplier to OEM</h3>
+
+  <p>Consider a Tier-1 automotive parts supplier — a company that manufactures brake assemblies and supplies them directly to an OEM vehicle assembly plant. The OEM (Original Equipment Manufacturer) runs its production scheduling on SAP PP (Production Planning). The supplier runs their manufacturing execution on a combination of SAP S/4HANA and a custom WMS. Both organisations use EDI X12 as their interchange standard, and both have AS2 as their mandated transport.</p>
+
+  <p>This type of relationship is called a <strong>Just-in-Time (JIT) or Just-in-Sequence (JIS) supply chain</strong>, where the supplier must deliver exactly the right parts, in exactly the right sequence, to the assembly line — often within a two-hour window. The EDI integration is not a nice-to-have: production stops if the messages fail.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-label">Real-World Scenario — Automotive JIT Supply Chain</div>
+    <svg width="100%" viewBox="0 0 660 380" xmlns="http://www.w3.org/2000/svg" style="font-family:'Source Sans 3',sans-serif;font-size:10px;">
+      <defs>
+        <marker id="arr5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <!-- OEM zone -->
+      <rect x="10" y="30" width="140" height="320" rx="8" fill="#e8f4fb" stroke="#1a7fb5" stroke-width="1" stroke-dasharray="5 3"/>
+      <text x="80" y="50" text-anchor="middle" font-size="11" font-weight="700" fill="#0d5a82">OEM Assembly Plant</text>
+      <rect x="20" y="58" width="120" height="38" rx="5" fill="#c8e0f5" stroke="#1a7fb5" stroke-width="0.7"/>
+      <text x="80" y="75" text-anchor="middle" font-size="10" font-weight="600" fill="#0d5a82">SAP PP</text>
+      <text x="80" y="88" text-anchor="middle" font-size="9" fill="#0d5a82">Production Schedule</text>
+      <rect x="20" y="106" width="120" height="38" rx="5" fill="#c8e0f5" stroke="#1a7fb5" stroke-width="0.7"/>
+      <text x="80" y="123" text-anchor="middle" font-size="10" font-weight="600" fill="#0d5a82">830 Planning Sched</text>
+      <text x="80" y="136" text-anchor="middle" font-size="9" fill="#0d5a82">Weekly production plan</text>
+      <rect x="20" y="154" width="120" height="38" rx="5" fill="#c8e0f5" stroke="#1a7fb5" stroke-width="0.7"/>
+      <text x="80" y="171" text-anchor="middle" font-size="10" font-weight="600" fill="#0d5a82">862 Shipping Sched</text>
+      <text x="80" y="184" text-anchor="middle" font-size="9" fill="#0d5a82">Precise JIT delivery time</text>
+      <rect x="20" y="202" width="120" height="38" rx="5" fill="#c8e0f5" stroke="#1a7fb5" stroke-width="0.7"/>
+      <text x="80" y="219" text-anchor="middle" font-size="10" font-weight="600" fill="#0d5a82">850 Purchase Order</text>
+      <text x="80" y="232" text-anchor="middle" font-size="9" fill="#0d5a82">Firm order confirmation</text>
+      <rect x="20" y="250" width="120" height="38" rx="5" fill="#c8e0f5" stroke="#1a7fb5" stroke-width="0.7"/>
+      <text x="80" y="267" text-anchor="middle" font-size="10" font-weight="600" fill="#0d5a82">824 App Advice</text>
+      <text x="80" y="280" text-anchor="middle" font-size="9" fill="#0d5a82">Error / exception feedback</text>
+
+      <!-- APM zone -->
+      <rect x="168" y="10" width="324" height="360" rx="10" fill="#eaf6f0" stroke="#1a7a4a" stroke-width="1.2"/>
+      <text x="330" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="#0e5a30">Anypoint Partner Manager</text>
+      <!-- APM internals -->
+      <rect x="184" y="38" width="140" height="38" rx="6" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.7"/>
+      <text x="254" y="56" text-anchor="middle" font-size="10" font-weight="600" fill="#145a38">Receive Service</text>
+      <text x="254" y="69" text-anchor="middle" font-size="9" fill="#145a38">AS2 endpoints (OEM + Supplier)</text>
+
+      <rect x="338" y="38" width="140" height="38" rx="6" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.7"/>
+      <text x="408" y="56" text-anchor="middle" font-size="10" font-weight="600" fill="#145a38">Transmit Service</text>
+      <text x="408" y="69" text-anchor="middle" font-size="9" fill="#145a38">856 ASN · 855 POA · 810</text>
+
+      <!-- MQ layer -->
+      <rect x="184" y="90" width="294" height="32" rx="6" fill="#f5ebff" stroke="#9b59b6" stroke-width="0.8"/>
+      <text x="331" y="107" text-anchor="middle" font-size="10" font-weight="600" fill="#7d3c98">Anypoint MQ — Internal Queue Layer</text>
+      <text x="331" y="117" text-anchor="middle" font-size="9" fill="#9b59b6">Decouples all services · DLQ on failure · Audit topic</text>
+
+      <rect x="184" y="134" width="294" height="60" rx="6" fill="#a8e6c8" stroke="#0e6644" stroke-width="0.9"/>
+      <text x="331" y="154" text-anchor="middle" font-size="11" font-weight="700" fill="#0a4a2e">Core B2B Engine</text>
+      <text x="331" y="168" text-anchor="middle" font-size="9" fill="#0a4a2e">Parse X12 830/862/850 · Validate · DataWeave Map</text>
+      <text x="331" y="181" text-anchor="middle" font-size="9" fill="#0a4a2e">Generate 997 FA · Custom attributes: PartNo, DeliveryWindow</text>
+
+      <rect x="184" y="208" width="294" height="32" rx="6" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.7"/>
+      <text x="331" y="226" text-anchor="middle" font-size="10" font-weight="600" fill="#145a38">Dispatch Service</text>
+      <text x="331" y="238" text-anchor="middle" font-size="9" fill="#145a38">Route to SAP PP API · WMS · MES (Manufacturing Execution)</text>
+
+      <rect x="184" y="254" width="294" height="32" rx="6" fill="#c8eedd" stroke="#1a7a4a" stroke-width="0.7"/>
+      <text x="331" y="272" text-anchor="middle" font-size="10" font-weight="600" fill="#145a38">Payload Storage + Tracking</text>
+      <text x="331" y="284" text-anchor="middle" font-size="9" fill="#145a38">S3 · Full audit log · Transaction Replay</text>
+
+      <rect x="184" y="300" width="294" height="32" rx="6" fill="#e8d5f5" stroke="#9b59b6" stroke-width="0.7"/>
+      <text x="331" y="318" text-anchor="middle" font-size="10" font-weight="600" fill="#7d3c98">APM Monitor</text>
+      <text x="331" y="330" text-anchor="middle" font-size="9" fill="#7d3c98">Real-time alerts · Delivery window SLA tracking · Replay</text>
+
+      <!-- Supplier zone -->
+      <rect x="510" y="30" width="138" height="320" rx="8" fill="#fdf3dc" stroke="#d4900a" stroke-width="1" stroke-dasharray="5 3"/>
+      <text x="579" y="50" text-anchor="middle" font-size="11" font-weight="700" fill="#7a4d00">Tier-1 Supplier</text>
+      <rect x="520" y="58" width="118" height="38" rx="5" fill="#fdebc8" stroke="#d4900a" stroke-width="0.7"/>
+      <text x="579" y="75" text-anchor="middle" font-size="10" font-weight="600" fill="#7a4d00">SAP S/4HANA</text>
+      <text x="579" y="88" text-anchor="middle" font-size="9" fill="#7a4d00">ERP / MM Module</text>
+      <rect x="520" y="106" width="118" height="38" rx="5" fill="#fdebc8" stroke="#d4900a" stroke-width="0.7"/>
+      <text x="579" y="123" text-anchor="middle" font-size="10" font-weight="600" fill="#7a4d00">WMS</text>
+      <text x="579" y="136" text-anchor="middle" font-size="9" fill="#7a4d00">Pick · Pack · Ship</text>
+      <rect x="520" y="154" width="118" height="38" rx="5" fill="#fdebc8" stroke="#d4900a" stroke-width="0.7"/>
+      <text x="579" y="171" text-anchor="middle" font-size="10" font-weight="600" fill="#7a4d00">MES</text>
+      <text x="579" y="184" text-anchor="middle" font-size="9" fill="#7a4d00">Production sequencing</text>
+      <rect x="520" y="202" width="118" height="38" rx="5" fill="#fdebc8" stroke="#d4900a" stroke-width="0.7"/>
+      <text x="579" y="219" text-anchor="middle" font-size="10" font-weight="600" fill="#7a4d00">856 ASN</text>
+      <text x="579" y="232" text-anchor="middle" font-size="9" fill="#7a4d00">Outbound to OEM</text>
+
+      <!-- OEM → APM arrows -->
+      <line x1="140" y1="77" x2="183" y2="57" stroke="#1a7fb5" stroke-width="1.2" marker-end="url(#arr5)"/>
+      <line x1="140" y1="125" x2="183" y2="65" stroke="#1a7fb5" stroke-width="1.2" marker-end="url(#arr5)"/>
+      <line x1="140" y1="173" x2="183" y2="75" stroke="#1a7fb5" stroke-width="1.2" marker-end="url(#arr5)"/>
+
+      <!-- APM → Supplier (dispatch) -->
+      <line x1="478" y1="225" x2="509" y2="79" stroke="#d4900a" stroke-width="1.2" marker-end="url(#arr5)"/>
+      <line x1="478" y1="230" x2="509" y2="125" stroke="#d4900a" stroke-width="1.2" marker-end="url(#arr5)"/>
+
+      <!-- Supplier → APM (856 outbound) -->
+      <line x1="519" y1="219" x2="479" y2="50" stroke="#9b59b6" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr5)"/>
+    </svg>
+    <p class="diagram-caption">Figure 7 — Automotive JIT supply chain: OEM sends 830 Planning Schedules, 862 Shipping Schedules, and 850 POs via APM to the Tier-1 supplier. APM's MQ layer buffers all messages, ensuring zero data loss even during SAP maintenance windows.</p>
+  </div>
+
+  <h3 class="sub-title">11.2 The JIT Document Lifecycle</h3>
+
+  <p><strong>Week ahead (830 Planning Schedule):</strong> The OEM's SAP PP system generates a weekly production forecast as an EDI 830 Planning Schedule. APM receives it via AS2, maps it to a structured JSON production plan, and posts it to the supplier's SAP S/4HANA materials management module. The supplier's planners use this to stage raw materials and pre-build sub-assemblies.</p>
+
+  <p><strong>48 hours before production (862 Shipping Schedule):</strong> The OEM refines the forecast into a precise EDI 862 Shipping Schedule — specifying exact part numbers, quantities, and delivery time windows down to the hour. APM maps this to a delivery instruction JSON and pushes it to the supplier's WMS and MES. The MES uses the 862 to sequence production runs so parts come off the line in the exact order they will be consumed by the assembly plant.</p>
+
+  <p><strong>On shipment (856 ASN):</strong> As the supplier's WMS confirms the shipment — with carrier details, container IDs, and part sequence numbers — it triggers an outbound flow in APM. APM maps the WMS JSON to an EDI 856 ASN and transmits it to the OEM via AS2, typically within minutes of the truck leaving the dock. The OEM's receiving system uses the 856 to schedule dock doors and pre-authorise inbound freight — without this, JIT delivery is not possible.</p>
+
+  <p><strong>Invoice and remittance (810 / 820):</strong> After receipt confirmation at the plant, the supplier's SAP generates an 810 Invoice. APM maps and transmits it electronically. The OEM's accounts payable processes it automatically via 3-way matching against the 850 PO and 856 receipt, and transmits an 820 Payment Remittance once the payment runs. APM maps the 820 back to a cash application JSON that updates the supplier's AR ledger.</p>
+
+  <div class="callout callout-success">
+    <div class="callout-label">Where This Pattern Is Used</div>
+    <p>This same JIT EDI pattern — 830 Planning Schedule, 862 Shipping Schedule, 856 ASN, 810 Invoice — is the standard across automotive (Ford, GM, Toyota, BMW), aerospace (Boeing, Airbus suppliers), and large-format retail (major grocery chains, department store chains). It is also increasingly adopted in pharmaceutical supply chains under FDA track-and-trace requirements, where the 856 ASN carries serialised unit-level identifiers rather than pallet SSCCs.</p>
+  </div>
+
+  <!-- ─── SECTION 12 ─── -->
+  <h2 class="section-title" id="s12">12. Best Practices &amp; Common Pitfalls</h2>
+
+  <p>After working with APM across multiple enterprise deployments, a few patterns consistently separate successful implementations from struggling ones.</p>
+
+  <h3 class="sub-title">12.1 Best Practices</h3>
+
+  <p><strong>Use centralised DataWeave maps.</strong> As of recent APM releases, you can manage DataWeave transformation logic in a central repository rather than embedding it in each message flow. This is crucial when you have 40 partners — you do not want 40 copies of the 850 → order JSON logic diverging over time. One canonical map, versioned, tested, reused everywhere.</p>
+
+  <p><strong>Extract meaningful business attributes.</strong> APM lets you define custom message attributes that are extracted from each transaction and stored in the tracking database. Always extract fields like <code>purchaseOrderNumber</code>, <code>invoiceNumber</code>, and <code>shipmentId</code>. These make it infinitely faster to search for a specific transaction in production, and they are what your operations team will search for when a partner calls about a missing shipment.</p>
+
+  <p><strong>Test 997 FA handling thoroughly.</strong> The 997 Functional Acknowledgement is automatically sent by APM, but you need to verify that your partners' systems process it correctly. If a partner's system does not receive a 997 within their timeout window, they may resend the original transaction — causing duplicates in your ERP. Confirm MDN and FA receipt with each partner before go-live.</p>
+
+  <p><strong>Stage your deployment.  </strong> APM supports sandbox and production environments. Always test new partner configurations end-to-end in sandbox using real test files provided by the partner. Do not go live until you have seen a complete roundtrip — inbound doc, 997 back, downstream system updated, outbound doc returned — in sandbox.</p>
+
+  <p><strong>Set up monitoring alerts early.</strong> Configure APM alerts for failed transactions before your first partner goes live, not after. A failed X12 850 that sits unnoticed for six hours is a partner relationship problem. A failed 856 ASN that misses the delivery window is a chargeback. Set alert thresholds aggressively in early production.</p>
+
+  <h3 class="sub-title">12.2 Common Pitfalls</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Pitfall</th><th>Symptom</th><th>Resolution</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>AS2 certificate mismatch</strong></td>
+          <td>Partner's AS2 sends fail with 400 or MDN error; transmissions never appear in APM</td>
+          <td>Verify the partner's public cert loaded in APM matches their signing cert exactly. Re-exchange certs if in doubt.</td>
+        </tr>
+        <tr>
+          <td><strong>ISA/GS identifier mismatch</strong></td>
+          <td>Transactions received but not routed to any message flow (appear as "unrouted")</td>
+          <td>Check ISA06/ISA08 and GS02/GS03 values in the raw EDI against what is configured in the partner profile. Whitespace padding in X12 IDs is a common culprit.</td>
+        </tr>
+        <tr>
+          <td><strong>DataWeave null pointer on optional segments</strong></td>
+          <td>Transform fails with NullPointerException for some transactions but not others</td>
+          <td>Always use <code>default</code> in DataWeave for optional X12 loops and elements. EDI optional elements are genuinely absent (not null), so <code>.element default ""</code> is essential.</td>
+        </tr>
+        <tr>
+          <td><strong>856 ASN late (after truck)</strong></td>
+          <td>Retailer issues chargebacks for missing ASN compliance</td>
+          <td>Trigger the ASN outbound flow at label print time in WMS, not at ship confirm time. The two can be minutes apart, but compliance requires arrival before the physical goods.</td>
+        </tr>
+        <tr>
+          <td><strong>CloudHub vCore undersizing</strong></td>
+          <td>APM flows are slow or queue up during peak transaction windows</td>
+          <td>Size vCores based on peak concurrent partner connections, not average. AS2 connections are synchronous — one stuck connection occupies a thread.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <p>B2B integration with Anypoint Partner Manager is not a simple plug-and-play exercise. It requires a genuine understanding of EDI standards, transport security, data transformation, and operational monitoring. But the investment pays back quickly: each additional partner onboarded to the same APM instance costs a fraction of the first, and the operational visibility you gain is genuinely transformational for supply chain teams that have been flying blind with VANs and spreadsheets.</p>
+
+  <p>The platform is also evolving rapidly. MuleSoft's <a href="https://blogs.mulesoft.com/news/anypoint-partner-manager-centralized-mapping-optimized-payloads-ai-insights/" target="_blank">March 2026 release</a> brought centralised translation maps, optimised payload storage, and AI-powered transaction insights — including agentic workflows where an AI agent can query transaction history, identify anomalies, and initiate partner outreach. The long-term direction is clear: B2B integration that is not just automated, but intelligent.</p>
+
+  <p>If you are evaluating APM for your organisation, I would recommend starting with a single high-volume partner (ideally one with a clean AS2 setup and a standard X12 document set), getting an end-to-end flow running in sandbox, and measuring the operational time savings before committing to a broader rollout. The value case tends to be self-evident once you have lived through your first 997 FA issue being resolved in two minutes instead of two hours.</p>
+
+  <!-- REFERENCES -->
+  <div class="references" id="s13">
+    <h3>References &amp; Further Reading</h3>
+    <ol>
+      <li>MuleSoft. <em>Anypoint Partner Manager Product Page</em>. Salesforce. <a href="https://www.mulesoft.com/platform/anypoint-partner-manager" target="_blank">mulesoft.com/platform/anypoint-partner-manager</a></li>
+      <li>MuleSoft Documentation. <em>Anypoint Partner Manager — Getting Started</em>. <a href="https://docs.mulesoft.com/partner-manager/latest/" target="_blank">docs.mulesoft.com/partner-manager/latest</a></li>
+      <li>MuleSoft Documentation. <em>Anypoint MQ Overview</em>. <a href="https://docs.mulesoft.com/mq/" target="_blank">docs.mulesoft.com/mq</a></li>
+      <li>Salesforce. <em>MuleSoft Anypoint Partner Manager Recognized by IDC MarketScape: B2B Middleware 2024</em>. January 24, 2025. <a href="https://www.salesforce.com/news/stories/idc-marketscape-b2b-middleware-2024/" target="_blank">salesforce.com/news/stories/idc-marketscape-b2b-middleware-2024</a></li>
+      <li>MuleSoft Blog. <em>What's New in Anypoint Partner Manager: Centralized Mapping, Optimized Payloads, and AI-Powered Insights</em>. March 2026. <a href="https://blogs.mulesoft.com/news/anypoint-partner-manager-centralized-mapping-optimized-payloads-ai-insights/" target="_blank">blogs.mulesoft.com/news/anypoint-partner-manager-centralized-mapping</a></li>
+      <li>MuleSoft Blog. <em>Unify EDI and APIs for B2B Partner Integrations with Anypoint Partner Manager</em>. March 2023. <a href="https://blogs.mulesoft.com/api-integration/edi-api-anypoint-partner-manager/" target="_blank">blogs.mulesoft.com/api-integration/edi-api-anypoint-partner-manager</a></li>
+      <li>Trailhead. <em>Understanding Anypoint Partner Manager for B2B Success</em>. <a href="https://trailhead.salesforce.com/content/learn/modules/anypoint-partner-manager-quick-look/get-to-know-anypoint-manager" target="_blank">trailhead.salesforce.com — Anypoint Partner Manager Quick Look</a></li>
+      <li>MuleSoft Documentation. <em>EDI X12 Connector — Parsing and Writing EDI</em>. <a href="https://docs.mulesoft.com/x12-edi-connector/latest/" target="_blank">docs.mulesoft.com/x12-edi-connector/latest</a></li>
+      <li>MuleSoft Documentation. <em>DataWeave 2.0 Language Reference</em>. <a href="https://docs.mulesoft.com/dataweave/latest/" target="_blank">docs.mulesoft.com/dataweave/latest</a></li>
+      <li>EDI2XML. <em>EDI ANSI X12 Transaction Set 850 Purchase Order Explained</em>. <a href="https://www.edi2xml.com/blog/edi-ansi-x12-transaction-set-850-purchase-order-explained/" target="_blank">edi2xml.com/blog/edi-ansi-x12-transaction-set-850</a></li>
+      <li>EDI2XML. <em>Understanding ANSI ASC X12 EDI 810 Invoice</em>. <a href="https://www.edi2xml.com/blog/what-is-an-ansi-asc-x12-edi-810-invoice/" target="_blank">edi2xml.com/blog/edi-810-invoice</a></li>
+      <li>Cleo. <em>EDI 856 — Advance Shipping Notice (ASN)</em>. <a href="https://www.cleo.com/edi-transactions/edi-856" target="_blank">cleo.com/edi-transactions/edi-856</a></li>
+      <li>ASC X12. <em>X12 EDI Standards and Transaction Sets</em>. <a href="https://x12.org/products/transaction-sets" target="_blank">x12.org/products/transaction-sets</a></li>
+    </ol>
+  </div>
+
+  <!-- TAGS -->
+  <div class="tags">
+    <span class="tag">MuleSoft</span>
+    <span class="tag">B2B Integration</span>
+    <span class="tag">EDI</span>
+    <span class="tag">X12</span>
+    <span class="tag">EDIFACT</span>
+    <span class="tag">Anypoint Partner Manager</span>
+    <span class="tag">Supply Chain</span>
+    <span class="tag">AS2</span>
+    <span class="tag">DataWeave</span>
+    <span class="tag">CloudHub</span>
+    <span class="tag">Integration Architecture</span>
+    <span class="tag">SAP</span>
+    <span class="tag">Salesforce</span>
+  </div>
+
+</div><!-- /article -->
+
+<footer>
+  <span>Written by Vishal Singh</span>
+  <span>·</span>
+  <span>Integration Engineer</span>
+  <span>·</span>
+  <span>March 2026</span>
+  <span>·</span>
+  <span>22 min read</span>
+</footer>
+
+</body>
+</html>
